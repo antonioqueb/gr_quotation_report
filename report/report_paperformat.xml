@@ -7,14 +7,17 @@
          its bottom edge sits at (margin_top - header_spacing), growing
          upward from there.
            margin_top      = 49.6mm  (body start)
-           header_spacing  = 12mm    (raises the header: its bottom rule
-                                      lands at ~37.6mm, 12mm of clearance
-                                      before the body; 2mm and 6mm gaps
-                                      still rendered too low in practice)
-           header height   = 34mm    (fixed in gr_external_layout.xml, so
-                                      its top sits at ~3.6mm; must shrink
-                                      when the spacing grows or the header
-                                      would clip past the top page edge)
+           header_spacing  = 2mm     (rule at ~47.6mm, per the reference)
+           header height   = 44.2mm  (fixed in gr_external_layout.xml, so
+                                      its top sits at ~3.4mm)
+
+         dpi MUST stay at 96: Odoo passes a zoom of 96/dpi to wkhtmltopdf
+         (>= 0.12.2), so any other dpi rescales every CSS mm/pt in the
+         document - at the previous dpi=150 everything rendered at 64% of
+         its physical size, which is why the header kept sitting ~12mm
+         lower than calculated (it is anchored bottom-up, so a shrunken
+         header drops its top edge) and the whole body looked compressed.
+         With dpi=96 the zoom is exactly 1.0 and CSS mm = physical mm.
          Never compensate with negative margins: this single set of page
          properties applies identically to page 1 and every later page.
 
@@ -31,8 +34,8 @@
         <field name="margin_left">11.5</field>
         <field name="margin_right">13.8</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">12</field>
-        <field name="dpi">150</field>
+        <field name="header_spacing">2</field>
+        <field name="dpi">96</field>
         <field name="disable_shrinking" eval="True"/>
     </record>
 </odoo>
