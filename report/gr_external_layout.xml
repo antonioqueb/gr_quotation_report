@@ -24,9 +24,14 @@
     <template id="gr_external_layout_standard" inherit_id="web.external_layout_standard" primary="True">
 
         <!-- Fixed header height + the black bottom rule of the reference.
-             43.95mm content + 0.25mm border = 44.2mm total. -->
+             39.75mm content + 0.25mm border = 40mm total. Combined with
+             margin_top=49.6 / header_spacing=6 (paperformat), the header
+             top sits at ~3.6mm and its bottom rule at ~43.6mm, leaving a
+             6mm clearance before the body starts at 49.6mm - the header
+             was landing on top of the first body lines with the previous
+             tighter 2mm gap. -->
         <xpath expr="//div[contains(@t-attf-class, 'header')]" position="attributes">
-            <attribute name="style">height: 43.95mm; border-bottom: 0.25mm solid #111111; overflow: hidden;</attribute>
+            <attribute name="style">height: 39.75mm; border-bottom: 0.25mm solid #111111; overflow: hidden;</attribute>
         </xpath>
 
         <!-- Replace the native logo+tagline strip with the three-zone
