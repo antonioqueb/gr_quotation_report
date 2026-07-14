@@ -196,27 +196,27 @@ class TestGrQuotationReportRendering(GrQuotationReportCommon):
         except Exception as exc:  # pragma: no cover - failure path
             self.fail("El template QWeb no cargó correctamente: %s" % exc)
 
-    def test_report_action_is_bound_to_sale_order(self):
-        action = self.env.ref("gr_quotation_report.action_report_gr_quotation")
+    def test_report_action_is_the_standard_sale_order_action(self):
+        # Per client instruction: no second/competing report action. We
+        # personalize sale.action_report_saleorder itself, so every entry
+        # point that already used it (Print, Send by email, chatter
+        # preview, mail templates) picks up the GR design with zero extra
+        # wiring on our side.
+        action = self.env.ref("sale.action_report_saleorder")
         self.assertEqual(action.model, "sale.order")
         self.assertEqual(action.report_type, "qweb-pdf")
+        self.assertEqual(action.report_name, "gr_quotation_report.report_gr_quotation_document")
         self.assertEqual(action.binding_model_id.model, "sale.order")
-
-    def test_gr_report_is_the_only_one_bound_to_sale_order(self):
-        standard_action = self.env.ref("sale.action_report_saleorder")
-        self.assertFalse(
-            standard_action.binding_model_id,
-            "El reporte estándar de Odoo debe quedar desvinculado de "
-            "sale.order para que 'Imprimir' use únicamente la Cotización "
-            "Getting Ready.")
+        self.assertEqual(
+            action.paperformat_id, self.env.ref("gr_quotation_report.paperformat_gr_quotation"))
 
     def test_gr_report_is_used_for_send_by_email(self):
-        gr_action = self.env.ref("gr_quotation_report.action_report_gr_quotation")
+        # These mail templates were never touched: they already reference
+        # sale.action_report_saleorder, which now renders our template.
+        gr_action = self.env.ref("sale.action_report_saleorder")
         for tmpl_xmlid in ("sale.email_template_edi_sale", "sale.mail_template_sale_confirmation"):
             template = self.env.ref(tmpl_xmlid)
-            self.assertEqual(
-                template.report_template_ids.ids, gr_action.ids,
-                "%s debe adjuntar únicamente la Cotización Getting Ready." % tmpl_xmlid)
+            self.assertIn(gr_action, template.report_template_ids)
 
     def test_report_body_requests_full_width(self):
         # web.report_layout renders <body class="container-fluid"> only when

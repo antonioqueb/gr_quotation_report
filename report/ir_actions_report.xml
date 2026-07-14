@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Additional print action, does not replace sale.report_saleorder /
-         sale.action_report_saleorder. It only appears in the "Print" menu
-         of the sale.order form thanks to binding_model_id/binding_type. -->
-    <record id="action_report_gr_quotation" model="ir.actions.report">
+    <!-- Per explicit client instruction: do NOT add a second, competing
+         report action for sale.order. Instead, personalize the standard
+         "Quotation / Order" action in place, so every entry point that
+         already uses it - the Print button, "Send by email", the chatter
+         preview, the portal PDF link - renders the GR design automatically,
+         with no extra action to bind/unbind and no mail template to touch. -->
+    <record id="sale.action_report_saleorder" model="ir.actions.report">
         <field name="name">Cotización Getting Ready</field>
-        <field name="model">sale.order</field>
-        <field name="report_type">qweb-pdf</field>
         <field name="report_name">gr_quotation_report.report_gr_quotation_document</field>
         <field name="report_file">gr_quotation_report.report_gr_quotation_document</field>
         <field name="print_report_name">object._gr_report_filename()</field>
         <field name="paperformat_id" ref="gr_quotation_report.paperformat_gr_quotation"/>
-        <field name="binding_model_id" ref="sale.model_sale_order"/>
-        <field name="binding_type">report</field>
     </record>
 </odoo>
