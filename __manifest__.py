@@ -1,6 +1,6 @@
 {
     "name": "GR - Reporte de Cotización",
-    "version": "19.0.10.1.0",
+    "version": "19.0.11.0.0",
     "category": "Sales/Sales",
     "summary": "Cotización PDF editorial de Getting Ready para órdenes de venta/renta",
     "description": """
@@ -38,6 +38,7 @@ tocar plantillas de correo ni desvincular nada.
     "data": [
         "security/ir.model.access.csv",
         "report/report_paperformat.xml",
+        "report/gr_external_layout.xml",
         "report/gr_quotation_report_templates.xml",
         "report/ir_actions_report.xml",
         "data/gr_quotation_policy_data.xml",

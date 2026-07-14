@@ -2,47 +2,31 @@
 <odoo>
 
     <!-- ================================================================
-         Root template. Uses Odoo's DEFAULT header/footer layout
-         (web.external_layout, i.e. whatever the company has configured
-         under Settings > General Settings > Document Layout: Standard /
-         Boxed / Bold / Striped) instead of a fully custom one. That layout
-         already gives us, on every page: company logo, address/tagline in
-         the header, and company footer text + page numbers in the footer.
-         Only the content in between ("informations" row, client/event
-         block, products, summary, policies, signatures) is ours.
+         Root template. Calls gr_external_layout_standard - an isolated,
+         PRIMARY inherited variant of Odoo's native Standard layout (see
+         gr_external_layout.xml) - so the native .header/.article/.footer
+         structure, footer text and page numbering are all preserved, while
+         the header shows CLIENTE / centered logo / date+folio and repeats
+         them automatically on every page. The layout is pinned to that
+         variant on purpose: the company's Standard/Boxed/Bold/Striped
+         picker would change the geometry this report is calibrated to.
     ================================================================= -->
     <template id="report_gr_quotation_document">
-        <!-- web.report_layout renders <body class="container"> (Bootstrap,
-             max-width ~960-1140px) unless full_width is truthy, in which case
-             it uses "container-fluid" (edge-to-edge). Without this, the
-             report was rendering at ~75-80% of the page width, pinned left,
-             with every proportional/mm measurement below computed against
-             that shrunk width instead of the real page. -->
+        <!-- web.report_layout (HTML preview) renders <body class="container">
+             (max-width) unless full_width is truthy; keep the preview
+             edge-to-edge like the PDF. -->
         <t t-set="full_width" t-value="1"/>
         <t t-call="web.html_container">
             <t t-call="gr_quotation_report.gr_quotation_style"/>
             <t t-foreach="docs" t-as="doc">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
-                <t t-call="web.external_layout">
-                    <!-- No "address" slot is set on purpose: the client's
-                         full contact details already have their own block
-                         further down (gr_quotation_client_event: CONTRATANTE,
-                         TELÉFONO, CORREO...), so showing a second, generic
-                         contact card up in the header was redundant. The
-                         company's own address block is hidden via CSS below
-                         ([name="company_address"]) per client request - the
-                         header keeps only the logo. -->
-                    <t t-set="layout_document_title">
-                        <span>Cotización # </span>
-                        <span t-field="doc.name">SO0000</span>
-                    </t>
+                <!-- o/company are normally set by web.external_layout before
+                     it dispatches to a concrete layout; since we t-call the
+                     concrete (inherited) layout directly, set them here. -->
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id.sudo()"/>
+                <t t-call="gr_quotation_report.gr_external_layout_standard">
                     <div class="page gr_doc">
-                        <div class="row mb-4" id="informations">
-                            <div class="col" name="gr_informations_date">
-                                <strong>Fecha de cotización</strong>
-                                <div t-esc="doc._gr_format_date(doc.date_order)"/>
-                            </div>
-                        </div>
                         <t t-call="gr_quotation_report.gr_quotation_client_event"/>
                         <t t-call="gr_quotation_report.gr_quotation_products"/>
                         <t t-call="gr_quotation_report.gr_quotation_summary"/>
@@ -58,9 +42,17 @@
     </template>
 
     <!-- ================================================================
-         Styles. Kept in one place, loaded once. Tables/blocks only, no
-         flexbox/grid, no CSS custom properties (wkhtmltopdf's WebKit does
-         not support them) so every color is written out literally.
+         Body styles. Everything is scoped to .gr_doc (or .gr_* classes):
+         no rules on html/body/main/#wrapwrap/.article, so the native
+         layout geometry and every other report stay untouched. The header
+         styles its own nodes inline (see gr_external_layout.xml) because
+         Odoo extracts the header into a separate wkhtmltopdf document that
+         this style block does not reach.
+
+         Measurements follow the visual reference on Letter paper with
+         margins 11.5mm (left) / 13.8mm (right): useful width 190.6mm,
+         panels 96.4mm + 2mm + 92.1mm, divider ~97.3mm from the page top,
+         product rows ~18.8mm tall, images boxed at 16.5 x 13.6mm.
     ================================================================= -->
     <template id="gr_quotation_style">
         <style>
@@ -85,119 +77,89 @@
                 font-weight: bold; font-style: italic;
             }
 
-            /* Client request: hide the company address block that Odoo's
-               default header layout (any of Standard/Boxed/Bold/Striped)
-               prints next to the logo. Every one of those layouts names
-               that block name="company_address", so this one rule covers
-               whichever the company has configured, without forking the
-               native template. Header keeps only the logo. */
-            [name="company_address"] { display: none !important; }
-
-            /* Hard ceiling on the header/footer's own rendered height, on
-               top of (not instead of) the paperformat's margin_top /
-               margin_bottom / header_spacing. wkhtmltopdf renders the
-               header as a separate document reserved a fixed band at the
-               top of every page; if the header's real height ever exceeds
-               that band (a long tagline, an oversized uploaded logo...) it
-               is not clipped by wkhtmltopdf, it bleeds down and overlaps
-               the first lines of body content on every following page.
-               This clamp guarantees that can't happen regardless of data. */
-            .header { max-height: 28mm; overflow: hidden; }
-            .footer { max-height: 16mm; overflow: hidden; }
-            .o_company_logo_small { max-height: 16mm !important; }
-
-            /* Belt-and-suspenders: neutralize Bootstrap's .container max-width
-               and gutters in case full_width isn't honored (e.g. a report
-               composed/previewed through a code path that overrides it), so
-               the page never silently reverts to a ~75-80%-wide column. */
-            html, body.o_body_html, body.container, body.container-fluid,
-            #wrapwrap, main, .article {
-                width: 100% !important;
-                max-width: none !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
             .gr_doc {
                 font-family: 'Nunito', Arial, Helvetica, sans-serif;
                 color: #111111;
                 font-size: 9.5pt;
                 width: 100%;
-                max-width: none;
-                margin: 0;
-                box-sizing: border-box;
                 line-height: 1.35;
             }
-            /* Root cause of the "Excel grid" look: web.external_layout tags
-               the .article with the company's document-layout class
-               (o_table_standard/bold/striped/boxed), whose CSS decorates
-               EVERY table inside the report - full cell borders, striped
-               row backgrounds, uppercase heads, and (Boxed) an outer frame
-               drawn with a ::before pseudo-element that a plain border
-               reset cannot remove. Our tables opt out through Odoo's
-               official escape hatch: each carries the
-               "o_ignore_layout_styling" class, which every one of those
-               rules excludes. The ::before frame is also neutralized here
-               as a second net. */
+            /* The document-layout table skins (o_table_standard etc.) are
+               opted out per-table via o_ignore_layout_styling; the ::before
+               outer frame some skins draw is neutralized here, scoped to
+               this report's tables only. */
             .gr_doc table::before { content: none !important; border: none !important; }
             .gr_doc table { border-collapse: collapse; }
             .gr_doc td, .gr_doc th { vertical-align: top; }
 
-            .gr_hr_thin { height: 1px; background-color: #111111; margin: 0 0 4mm 0; }
-            .gr_hr_thick { height: 1px; background-color: #111111; margin: 4mm 0 4mm 0; }
+            /* Black rules of the reference (0.25mm). The first one closes
+               the info panels at ~97.3mm from the page top: panels end at
+               ~94.4mm, +2.9mm gap. */
+            .gr_hr_thin { height: 0.25mm; background-color: #111111; margin: 2.9mm 0 0 0; }
+            .gr_hr_thick { height: 0.25mm; background-color: #111111; margin: 4mm 0 4mm 0; }
 
-            /* ---- client / event block ---- (design as per the reference
-               PDF: soft beige panel + thin light-gray outlines, exactly the
-               first-version look) */
-            .gr_info_table { width: 100%; table-layout: fixed; margin-bottom: 3mm; }
+            /* ---- client / event panels ----
+               96.4mm + 2mm + 92.1mm over a 190.6mm useful width. */
+            .gr_info_table { width: 100%; table-layout: fixed; }
             .gr_info_left {
-                width: 51%; background-color: #F4F1EF; border: 1px solid #C9C9C9;
-                padding: 2.8mm; vertical-align: top; overflow-wrap: break-word;
+                width: 96.4mm; height: 44.8mm;
+                background-color: #F2EEEC; border: 0.2mm solid #CCCCCC;
+                padding: 1.6mm; vertical-align: top; overflow-wrap: break-word;
             }
-            .gr_info_spacer { width: 1%; }
-            .gr_info_right { width: 48%; vertical-align: top; padding: 0; }
+            .gr_info_spacer { width: 2mm; }
+            .gr_info_right { width: 92.1mm; vertical-align: top; padding: 0; }
             .gr_box_white {
-                border: 1px solid #C9C9C9; background-color: #ffffff;
-                padding: 2.5mm; vertical-align: top;
+                min-height: 22.4mm; background-color: #ffffff;
+                border: 0.2mm solid #CCCCCC; padding: 1.6mm;
             }
-            .gr_box_venue { margin-top: 1.5mm; }
+            .gr_box_venue { min-height: 21mm; background-color: #FAFAF8; margin-top: 1.2mm; }
             .gr_subgrid { width: 100%; table-layout: fixed; margin-top: 1mm; }
             .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; }
             .gr_label {
-                display: block; font-size: 7pt; text-transform: uppercase;
+                display: block; font-size: 6.8pt; text-transform: uppercase;
                 color: #111111; margin-bottom: 0.3mm;
             }
             .gr_value {
-                display: block; font-size: 10.5pt; font-weight: bold; font-style: italic;
-                color: #111111; margin-bottom: 1.8mm;
+                display: block; font-size: 10.2pt; font-weight: bold; font-style: italic;
+                color: #111111; margin-bottom: 1.4mm;
             }
             .gr_value_block { white-space: pre-line; }
 
-            /* ---- products table ---- */
-            .gr_products_table { width: 100%; table-layout: fixed; margin-top: 1mm; }
+            /* ---- products table ----
+               Starts ~12.9mm below the divider; heads underline the text
+               only (no full-width cell border); rows ~18.8mm tall. */
+            .gr_products_table { width: 100%; table-layout: fixed; margin-top: 12.9mm; }
             .gr_products_table thead th {
-                border-bottom: 1px solid #111111; font-size: 10.5pt; font-weight: bold;
-                padding-bottom: 1.8mm; text-align: left;
+                font-size: 10.5pt; font-weight: bold; color: #111111;
+                text-decoration: underline; text-align: left;
+                padding-bottom: 1.5mm;
             }
             .gr_th_center { text-align: center !important; }
             .gr_th_right { text-align: right !important; }
-            .gr_products_table tbody td { padding: 3.2mm 1mm; font-size: 9pt; }
+            .gr_products_table tbody td {
+                height: 18.8mm; padding: 1.2mm 1mm;
+                font-size: 9pt; line-height: 1.25;
+            }
             .gr_row_product { page-break-inside: avoid; }
             .gr_td_center { text-align: center; }
             .gr_td_right { text-align: right; }
-            .gr_product_img { max-width: 19mm; max-height: 19mm; display: block; margin: 0 auto; }
-            .gr_img_placeholder { width: 19mm; height: 19mm; margin: 0 auto; background-color: #F4F1EF; }
-            .gr_article_title { font-size: 9pt; font-weight: bold; }
+            .gr_product_img { max-width: 16.5mm; max-height: 13.6mm; }
+            .gr_img_placeholder {
+                width: 16.5mm; height: 13.6mm; margin: 0 auto;
+                border: 0.2mm solid #111111; background-color: #FAFAF8;
+            }
+            .gr_article_title { font-size: 9pt; font-weight: normal; }
             .gr_article_extra {
                 font-size: 8.5pt; color: #333333; margin-top: 1mm; white-space: pre-line;
             }
             .gr_row_section td {
                 font-weight: bold; text-transform: uppercase; font-size: 9.5pt;
-                border-top: 1px solid #C9C9C9; padding-top: 3.5mm !important;
+                border-top: 0.2mm solid #C9C9C9; padding-top: 3.5mm !important;
+                height: auto !important;
             }
-            .gr_row_note td { font-style: italic; color: #333333; }
+            .gr_row_note td { font-style: italic; color: #333333; height: auto !important; }
 
-            /* ---- summary ---- (first-version look) */
+            /* ---- summary ---- */
             .gr_summary_wrap { width: 100%; table-layout: fixed; margin-top: 4mm; page-break-inside: avoid; }
             .gr_summary_spacer { width: 55%; }
             .gr_summary_col { width: 45%; vertical-align: top; }
@@ -224,7 +186,7 @@
             .gr_sign_wrap { width: 100%; table-layout: fixed; margin-top: 9mm; page-break-inside: avoid; }
             .gr_sign_cell { width: 45%; text-align: center; vertical-align: bottom; }
             .gr_sign_gap { width: 10%; }
-            .gr_sign_line { border-top: 1px solid #111111; margin-top: 18mm; }
+            .gr_sign_line { border-top: 0.25mm solid #111111; margin-top: 18mm; }
             .gr_sign_title {
                 font-weight: bold; text-transform: uppercase; font-size: 9pt;
                 margin-top: 1.5mm;
@@ -234,7 +196,7 @@
     </template>
 
     <!-- ================================================================
-         Client contact + event + assembly/disassembly block.
+         Client contact + event + assembly/disassembly panels.
     ================================================================= -->
     <template id="gr_quotation_client_event">
         <t t-set="contracting" t-value="doc._gr_get_contracting_partner()"/>
@@ -283,20 +245,20 @@
     </template>
 
     <!-- ================================================================
-         Products table. Any number of lines; sections/notes render as a
-         full-width row instead of a product row; down payment lines are
-         not shown as furniture.
+         Products table. Any number of lines; sections/subsections/notes
+         render as a full-width row; down payments are not shown as
+         furniture. Column heads repeat on page breaks (thead).
     ================================================================= -->
     <template id="gr_quotation_products">
         <table class="gr_products_table o_ignore_layout_styling">
             <colgroup>
-                <col style="width:7%"/>
+                <col style="width:7.4%"/>
+                <col style="width:13.6%"/>
+                <col style="width:25.9%"/>
+                <col style="width:14.5%"/>
+                <col style="width:11.6%"/>
                 <col style="width:15%"/>
-                <col style="width:29%"/>
-                <col style="width:13%"/>
-                <col style="width:11%"/>
                 <col style="width:12%"/>
-                <col style="width:13%"/>
             </colgroup>
             <thead>
                 <tr>
@@ -437,6 +399,5 @@
             </tr>
         </table>
     </template>
-
 
 </odoo>

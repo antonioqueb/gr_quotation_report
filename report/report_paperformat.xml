@@ -1,37 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Dedicated Letter/vertical paper format for the GR quotation report.
-         The report uses Odoo's default header/footer (web.external_layout).
-         wkhtmltopdf ties the HEADER's own vertical position to margin_top
-         (the header is drawn starting at that line, not floated above it),
-         so raising margin_top visibly pushes the header itself further down
-         the page - that is not what we want here. header_spacing is the
-         lever that pushes the BODY content further down *without* moving
-         the header: it is the gap inserted between the end of the header
-         and the start of body content, on every page (a wkhtmltopdf page
-         property, not a first-page-only setting). So: margin_top stays at
-         the value that keeps the header where it was, and header_spacing is
-         generous enough that body content - and, on later pages, the
-         continuation of the products table / policies - never starts
-         before the header has fully finished rendering. The header/footer
-         CSS max-height clamp (see gr_quotation_report_templates.xml) is the
-         second, independent safety net in case a company logo/tagline ever
-         renders taller than expected. -->
-    <!-- format='Letter' already fixes the physical page to 215.9 x 279.4 mm
-         (8.5x11in ~ 216x279.4mm requested). page_width/page_height must stay
-         empty: report.paperformat forbids combining a named format with an
-         explicit custom size (see _check_format_or_page constraint). -->
+    <!-- Letter/vertical paper format calibrated to the visual reference.
+
+         wkhtmltopdf geometry: body content starts at margin_top from the
+         physical page top on EVERY page; the native header is anchored so
+         its bottom edge sits at (margin_top - header_spacing), growing
+         upward from there. Reference targets: body at ~49.6mm, header
+         bottom rule at ~47.4mm, header top (logo) at ~3.2mm.
+           margin_top      = 49.6mm  (body start)
+           header_spacing  = 2mm     (Integer field; rule lands at ~47.6mm,
+                                      within tolerance of the 47.4mm target)
+           header height   = 44.2mm  (fixed in gr_external_layout.xml, so
+                                      its top sits at ~3.4mm)
+         Never compensate with negative margins: this single set of page
+         properties applies identically to page 1 and every later page.
+
+         format='Letter' fixes the page to 215.9 x 279.4mm; page_width/
+         page_height must stay empty (report.paperformat forbids combining
+         a named format with a custom size - see _check_format_or_page). -->
     <record id="paperformat_gr_quotation" model="report.paperformat">
         <field name="name">Getting Ready - Cotización (Carta)</field>
         <field name="default" eval="False"/>
         <field name="format">Letter</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">35</field>
+        <field name="margin_top">49.6</field>
         <field name="margin_bottom">18</field>
-        <field name="margin_left">13</field>
-        <field name="margin_right">13</field>
+        <field name="margin_left">11.5</field>
+        <field name="margin_right">13.8</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">22</field>
+        <field name="header_spacing">2</field>
         <field name="dpi">150</field>
         <field name="disable_shrinking" eval="True"/>
     </record>

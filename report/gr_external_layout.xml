@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Isolated PRIMARY variant of Odoo's native Standard layout, used
+         only by the GR quotation report (the report t-calls this template
+         by name; web.external_layout_standard itself is never modified, so
+         every other report keeps the stock header/footer).
+
+         Geometry (from the visual reference, Letter page):
+           header band top .......... ~3.2mm  from the page top
+           header bottom rule ....... ~47.4mm from the page top
+           body content starts ...... ~49.6mm from the page top
+         wkhtmltopdf anchors the header so its bottom edge sits at
+         (margin_top - header_spacing); with margin_top=49.6 and
+         header_spacing=2 (see report_paperformat.xml) the rule lands at
+         ~47.6mm and the header, being 44.2mm tall drawn bottom-up, starts
+         at ~3.4mm. The .header keeps its native class/structure - only its
+         inner nodes are reorganized.
+
+         IMPORTANT: when rendering to PDF, Odoo extracts this .header div
+         into a SEPARATE wkhtmltopdf sub-document; the report's body
+         <style> does not travel with it. Everything the header needs
+         (fonts included) is therefore declared inline / in the embedded
+         <style> below. -->
+    <template id="gr_external_layout_standard" inherit_id="web.external_layout_standard" primary="True">
+
+        <!-- Fixed header height + the black bottom rule of the reference.
+             43.95mm content + 0.25mm border = 44.2mm total. -->
+        <xpath expr="//div[contains(@t-attf-class, 'header')]" position="attributes">
+            <attribute name="style">height: 43.95mm; border-bottom: 0.25mm solid #111111; overflow: hidden;</attribute>
+        </xpath>
+
+        <!-- Replace the native logo+tagline strip with the three-zone
+             reference header: CLIENTE (left) / centered logo / date+folio
+             (right). Uses the native company.logo, no second copy. -->
+        <xpath expr="//div[contains(@t-attf-class, 'header')]/div[hasclass('d-flex')]" position="replace">
+            <style>
+                @font-face {
+                    font-family: 'Nunito';
+                    src: url('/gr_quotation_report/static/src/fonts/Nunito-Regular.woff') format('woff');
+                    font-weight: normal; font-style: normal;
+                }
+                @font-face {
+                    font-family: 'Nunito';
+                    src: url('/gr_quotation_report/static/src/fonts/Nunito-Bold.woff') format('woff');
+                    font-weight: bold; font-style: normal;
+                }
+                @font-face {
+                    font-family: 'Nunito';
+                    src: url('/gr_quotation_report/static/src/fonts/Nunito-Italic.woff') format('woff');
+                    font-weight: normal; font-style: italic;
+                }
+                @font-face {
+                    font-family: 'Nunito';
+                    src: url('/gr_quotation_report/static/src/fonts/Nunito-BoldItalic.woff') format('woff');
+                    font-weight: bold; font-style: italic;
+                }
+                .gr_hdr_table {
+                    width: 100%; table-layout: fixed; border-collapse: collapse;
+                    font-family: 'Nunito', Arial, Helvetica, sans-serif;
+                }
+                .gr_hdr_side {
+                    font-size: 10.5pt; font-weight: bold; line-height: 1.15;
+                    color: #111111; padding-top: 7mm; vertical-align: top;
+                    overflow: hidden;
+                }
+            </style>
+            <table class="gr_hdr_table">
+                <tr>
+                    <td class="gr_hdr_side" style="width: 29%; text-align: left;">
+                        <span>CLIENTE: </span>
+                        <span style="color: #BEAB9F;" t-esc="(o.partner_id.name or '').upper()"/>
+                    </td>
+                    <td style="width: 42%; text-align: center; vertical-align: top;">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"
+                             style="max-width: 69.9mm; max-height: 39.7mm;"/>
+                    </td>
+                    <td class="gr_hdr_side" style="width: 29%; text-align: right;">
+                        <div>FECHA DE COT.: <t t-esc="o._gr_format_date(o.date_order)"/></div>
+                        <div>COTIZACIÓN: <t t-esc="o.name"/></div>
+                    </td>
+                </tr>
+            </table>
+        </xpath>
+
+        <!-- Drop the company address / details / VAT block: this report's
+             header keeps only the three zones above. Other reports are not
+             affected (primary variant). -->
+        <xpath expr="//div[contains(@t-attf-class, 'header')]/div[hasclass('row')]" position="replace"/>
+
+        <!-- No document title inside the body: folio and date already live
+             in the header and repeat on every page. -->
+        <xpath expr="//h2[@t-out='layout_document_title']" position="replace"/>
+
+    </template>
+</odoo>
