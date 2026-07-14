@@ -7,12 +7,14 @@
          its bottom edge sits at (margin_top - header_spacing), growing
          upward from there.
            margin_top      = 49.6mm  (body start)
-           header_spacing  = 6mm     (Integer field; a tighter 2mm gap made
-                                      the rendered header land on the first
-                                      body lines, so the header is raised:
-                                      rule at ~43.6mm, 6mm of clearance)
-           header height   = 40mm    (fixed in gr_external_layout.xml, so
-                                      its top sits at ~3.6mm)
+           header_spacing  = 12mm    (raises the header: its bottom rule
+                                      lands at ~37.6mm, 12mm of clearance
+                                      before the body; 2mm and 6mm gaps
+                                      still rendered too low in practice)
+           header height   = 34mm    (fixed in gr_external_layout.xml, so
+                                      its top sits at ~3.6mm; must shrink
+                                      when the spacing grows or the header
+                                      would clip past the top page edge)
          Never compensate with negative margins: this single set of page
          properties applies identically to page 1 and every later page.
 
@@ -29,7 +31,7 @@
         <field name="margin_left">11.5</field>
         <field name="margin_right">13.8</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">6</field>
+        <field name="header_spacing">12</field>
         <field name="dpi">150</field>
         <field name="disable_shrinking" eval="True"/>
     </record>
