@@ -93,9 +93,7 @@ class SaleOrderLine(models.Model):
             is_rental = line.x_line_type in ("serial_rental", "quantity_rental") or (
                 not line.x_line_type and line.product_id and line.product_id.rent_ok)
             if not line.display_type and line.product_id and is_rental:
-                start = end = False
-                if "_get_billable_period" in dir(line):
-                    start, end = line._get_billable_period()
+                start, end = line._get_billable_period()
                 if start and end and end > start:
                     days = max(1, math.ceil((end - start).total_seconds() / 86400.0))
                     label = _("1 día") if days == 1 else _("%d días") % days

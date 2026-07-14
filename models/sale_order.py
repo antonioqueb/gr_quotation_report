@@ -73,6 +73,9 @@ class SaleOrder(models.Model):
             order.x_amount_gross_subtotal = gross
             order.x_amount_discount_total = discount
 
+    @api.depends("invoice_ids.state", "invoice_ids.amount_residual",
+                 "invoice_ids.amount_total", "invoice_ids.currency_id",
+                 "amount_total")
     def _compute_gr_paid_amounts(self):
         """Best-effort 'amount paid' / 'overpayment' for the report.
 
