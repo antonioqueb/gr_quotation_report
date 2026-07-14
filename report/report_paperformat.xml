@@ -7,10 +7,10 @@
          its bottom edge sits at (margin_top - header_spacing), growing
          upward from there.
            margin_top      = 49.6mm  (body start)
-           header_spacing  = 42mm    (each extra mm of spacing raises the
+           header_spacing  = 46mm    (each extra mm of spacing raises the
                                       rendered band ~1mm on this server,
-                                      per the visual iterations; +12mm
-                                      requested on top of the previous 30)
+                                      per the visual iterations; +4mm
+                                      requested on top of the previous 42)
            header height   = 28mm    (fixed in gr_external_layout.xml;
                                       grown slightly so the logo can reach
                                       27mm while the band stays compact)
@@ -38,7 +38,7 @@
         <field name="margin_left">11.5</field>
         <field name="margin_right">13.8</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">42</field>
+        <field name="header_spacing">46</field>
         <field name="dpi">96</field>
         <field name="disable_shrinking" eval="True"/>
     </record>

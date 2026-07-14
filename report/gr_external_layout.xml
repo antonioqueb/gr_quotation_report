@@ -23,14 +23,14 @@
          <style> below. -->
     <template id="gr_external_layout_standard" inherit_id="web.external_layout_standard" primary="True">
 
-        <!-- Header band raised further (header_spacing=30 in the
-             paperformat pushes the anchor up; empirically each extra mm of
-             spacing raises the rendered band ~1mm on this server) with a
-             slightly taller 28mm band (27.75mm + 0.25mm border) so the
-             logo can grow to 27mm and still fill nearly the whole band.
+        <!-- Header band: 35.75mm content + 0.25mm border = 36mm total,
+             sized so the logo can reach 35mm (30% larger than the previous
+             27mm). The band's vertical position is driven by
+             header_spacing in the paperformat (empirically each extra mm
+             of spacing raises the rendered band ~1mm on this server).
              Body keeps starting at margin_top=49.6mm. -->
         <xpath expr="//div[contains(@t-attf-class, 'header')]" position="attributes">
-            <attribute name="style">height: 27.75mm; border-bottom: 0.25mm solid #111111; overflow: hidden;</attribute>
+            <attribute name="style">height: 35.75mm; border-bottom: 0.25mm solid #111111; overflow: hidden;</attribute>
         </xpath>
 
         <!-- Replace the native logo+tagline strip with the three-zone
@@ -76,7 +76,7 @@
                     </td>
                     <td style="width: 42%; text-align: center; vertical-align: top;">
                         <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"
-                             style="max-width: 69.9mm; max-height: 27mm;"/>
+                             style="max-width: 69.9mm; max-height: 35mm;"/>
                     </td>
                     <td class="gr_hdr_side" style="width: 29%; text-align: right;">
                         <div>FECHA DE COT.: <t t-esc="o._gr_format_date(o.date_order)"/></div>
