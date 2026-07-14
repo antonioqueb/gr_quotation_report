@@ -148,11 +148,7 @@
             }
             .gr_box_venue { margin-top: 1.5mm; }
             .gr_subgrid { width: 100%; table-layout: fixed; margin-top: 1mm; }
-            /* FECHA DE MONTAJE / FECHA DE DESMONTAJE are two independent
-               cells with breathing room and a visible divider between them,
-               instead of sitting flush against each other. */
-            .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; padding-right: 3mm; }
-            .gr_half + .gr_half { padding-right: 0; padding-left: 3mm; border-left: 1px solid #C9C9C9; }
+            .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; }
             .gr_label {
                 display: block; font-size: 7pt; text-transform: uppercase;
                 color: #111111; margin-bottom: 0.3mm;
