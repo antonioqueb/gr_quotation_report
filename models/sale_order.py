@@ -113,8 +113,10 @@ class SaleOrder(models.Model):
 
     def _gr_get_contact_phone(self):
         self.ensure_one()
+        # res.partner no longer has a separate 'mobile' field in Odoo 19;
+        # 'phone' is the single phone/cell field.
         partner = self._gr_get_contracting_partner()
-        return partner.phone or partner.mobile or self.partner_id.phone or self.partner_id.mobile or ""
+        return partner.phone or self.partner_id.phone or ""
 
     def _gr_get_contact_email(self):
         self.ensure_one()
