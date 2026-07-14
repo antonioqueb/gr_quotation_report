@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         Root template. No web.external_layout is used on purpose: it would
+         bring back Odoo's standard commercial header/footer. The page is
+         built entirely by this module's own markup, per doc.
+    ================================================================= -->
+    <template id="report_gr_quotation_document">
+        <t t-call="web.html_container">
+            <t t-call="gr_quotation_report.gr_quotation_style"/>
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+                    <div class="gr_doc">
+                        <t t-call="gr_quotation_report.gr_quotation_header"/>
+                        <t t-call="gr_quotation_report.gr_quotation_client_event"/>
+                        <t t-call="gr_quotation_report.gr_quotation_products"/>
+                        <t t-call="gr_quotation_report.gr_quotation_summary"/>
+                        <t t-call="gr_quotation_report.gr_quotation_policies"/>
+                        <t t-call="gr_quotation_report.gr_quotation_signatures"/>
+                        <t t-call="gr_quotation_report.gr_quotation_corporate_footer"/>
+                    </div>
+                </t>
+                <t t-if="not doc_last">
+                    <div style="page-break-after: always;"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Styles. Kept in one place, loaded once. Tables/blocks only, no
+         flexbox/grid, no CSS custom properties (wkhtmltopdf's WebKit does
+         not support them) so every color is written out literally.
+    ================================================================= -->
+    <template id="gr_quotation_style">
+        <style>
+            @font-face {
+                font-family: 'Nunito';
+                src: url('/gr_quotation_report/static/src/fonts/Nunito-Regular.woff') format('woff');
+                font-weight: normal; font-style: normal;
+            }
+            @font-face {
+                font-family: 'Nunito';
+                src: url('/gr_quotation_report/static/src/fonts/Nunito-Bold.woff') format('woff');
+                font-weight: bold; font-style: normal;
+            }
+            @font-face {
+                font-family: 'Nunito';
+                src: url('/gr_quotation_report/static/src/fonts/Nunito-Italic.woff') format('woff');
+                font-weight: normal; font-style: italic;
+            }
+            @font-face {
+                font-family: 'Nunito';
+                src: url('/gr_quotation_report/static/src/fonts/Nunito-BoldItalic.woff') format('woff');
+                font-weight: bold; font-style: italic;
+            }
+
+            .gr_doc {
+                font-family: 'Nunito', Arial, Helvetica, sans-serif;
+                color: #111111;
+                font-size: 9.5pt;
+                line-height: 1.35;
+            }
+            .gr_doc table { border-collapse: collapse; }
+            .gr_doc td, .gr_doc th { vertical-align: top; }
+
+            /* ---- header ---- */
+            .gr_header_table { width: 100%; margin-bottom: 3mm; }
+            .gr_header_left { width: 32%; text-align: left; vertical-align: middle; }
+            .gr_header_center { width: 36%; text-align: center; vertical-align: middle; }
+            .gr_header_right { width: 32%; text-align: right; vertical-align: middle; font-size: 10pt; }
+            .gr_header_label { color: #111111; font-weight: bold; }
+            .gr_header_client {
+                color: #BDAA9F; font-weight: bold; text-transform: uppercase;
+                font-size: 10.5pt;
+            }
+            .gr_logo_img { max-width: 62mm; max-height: 30mm; display: block; margin: 0 auto; }
+            .gr_wordmark {
+                font-weight: bold; letter-spacing: 2px; text-transform: uppercase;
+                font-size: 15pt; margin-top: 1mm;
+            }
+            .gr_subwordmark {
+                font-size: 7pt; letter-spacing: 1.5px; text-transform: uppercase;
+                color: #333333; margin-top: 0.5mm;
+            }
+            .gr_hr_thin { height: 1px; background-color: #111111; margin: 0 0 4mm 0; }
+            .gr_hr_thick { height: 1px; background-color: #111111; margin: 4mm 0 4mm 0; }
+
+            /* ---- client / event block ---- */
+            .gr_info_table { width: 100%; margin-bottom: 3mm; }
+            .gr_info_left {
+                width: 51%; background-color: #F4F1EF; border: 1px solid #C9C9C9;
+                padding: 2.8mm; vertical-align: top;
+            }
+            .gr_info_spacer { width: 1%; }
+            .gr_info_right { width: 48%; vertical-align: top; padding: 0; }
+            .gr_box_white {
+                border: 1px solid #C9C9C9; background-color: #ffffff;
+                padding: 2.5mm; vertical-align: top;
+            }
+            .gr_box_venue { margin-top: 1.5mm; }
+            .gr_subgrid { width: 100%; margin-top: 1mm; }
+            .gr_half { width: 50%; vertical-align: top; }
+            .gr_label {
+                display: block; font-size: 7pt; text-transform: uppercase;
+                color: #111111; margin-bottom: 0.3mm;
+            }
+            .gr_value {
+                display: block; font-size: 10.5pt; font-weight: bold; font-style: italic;
+                color: #111111; margin-bottom: 1.8mm;
+            }
+            .gr_value_block { white-space: pre-line; }
+
+            /* ---- products table ---- */
+            .gr_products_table { width: 100%; margin-top: 1mm; }
+            .gr_products_table thead th {
+                border-bottom: 1px solid #111111; font-size: 10.5pt; font-weight: bold;
+                padding-bottom: 1.8mm; text-align: left;
+            }
+            .gr_th_center { text-align: center !important; }
+            .gr_th_right { text-align: right !important; }
+            .gr_products_table tbody td { padding: 3.2mm 1mm; font-size: 9pt; }
+            .gr_row_product { page-break-inside: avoid; }
+            .gr_td_center { text-align: center; }
+            .gr_td_right { text-align: right; }
+            .gr_product_img { max-width: 19mm; max-height: 19mm; display: block; margin: 0 auto; }
+            .gr_img_placeholder { width: 19mm; height: 19mm; margin: 0 auto; background-color: #F4F1EF; }
+            .gr_article_title { font-size: 9pt; font-weight: bold; }
+            .gr_article_extra {
+                font-size: 8.5pt; color: #333333; margin-top: 1mm; white-space: pre-line;
+            }
+            .gr_row_section td {
+                font-weight: bold; text-transform: uppercase; font-size: 9.5pt;
+                border-top: 1px solid #C9C9C9; padding-top: 3.5mm !important;
+            }
+            .gr_row_note td { font-style: italic; color: #333333; }
+
+            /* ---- summary ---- */
+            .gr_summary_wrap { width: 100%; margin-top: 4mm; page-break-inside: avoid; }
+            .gr_summary_spacer { width: 55%; }
+            .gr_summary_col { width: 45%; vertical-align: top; }
+            .gr_summary_table { width: 100%; }
+            .gr_summary_table td { padding: 1.1mm 0; font-size: 9pt; }
+            .gr_summary_label { text-align: right; font-style: italic; padding-right: 3mm !important; white-space: nowrap; }
+            .gr_summary_value { text-align: right; white-space: nowrap; }
+            .gr_summary_strong td { font-weight: bold; font-style: italic; }
+
+            /* ---- policies ---- */
+            .gr_policies_wrap { margin-top: 2mm; }
+            .gr_policies_title {
+                font-weight: bold; text-transform: uppercase; text-decoration: underline;
+                font-size: 10pt; margin-bottom: 2.5mm;
+            }
+            .gr_policy_list {
+                font-size: 8.7pt; line-height: 1.22; margin: 0; padding-left: 5mm;
+                text-align: justify;
+            }
+            .gr_policy_list li { margin-bottom: 1.6mm; padding-left: 1mm; }
+            .gr_policy_list ul { margin: 1mm 0 1mm 4mm; padding-left: 3mm; list-style: disc; }
+
+            /* ---- signatures ---- */
+            .gr_sign_wrap { width: 100%; margin-top: 9mm; page-break-inside: avoid; }
+            .gr_sign_cell { width: 45%; text-align: center; vertical-align: bottom; }
+            .gr_sign_gap { width: 10%; }
+            .gr_sign_line { border-top: 1px solid #111111; margin-top: 18mm; }
+            .gr_sign_title {
+                font-weight: bold; text-transform: uppercase; font-size: 9pt;
+                margin-top: 1.5mm;
+            }
+            .gr_sign_legend { font-size: 6.8pt; color: #333333; margin-top: 1mm; }
+
+            /* ---- corporate footer ---- */
+            .gr_corp_footer {
+                margin-top: 11mm; text-align: center; font-size: 8pt; color: #333333;
+                page-break-inside: avoid;
+            }
+            .gr_corp_logo { max-height: 14mm; margin: 0 auto 2mm auto; display: block; }
+            .gr_corp_name { font-weight: bold; color: #111111; }
+        </style>
+    </template>
+
+    <!-- ================================================================
+         Header: only rendered once, at the top of each order's document
+         (normal block flow, not a running page header).
+    ================================================================= -->
+    <template id="gr_quotation_header">
+        <t t-set="company" t-value="doc.company_id"/>
+        <t t-set="logo_bin" t-value="company.x_gr_quotation_logo or company.logo"/>
+        <table class="gr_header_table">
+            <tr>
+                <td class="gr_header_left">
+                    <span class="gr_header_label">CLIENTE: </span>
+                    <t t-if="doc.partner_id.name">
+                        <span class="gr_header_client" t-esc="doc.partner_id.name.upper()"/>
+                    </t>
+                </td>
+                <td class="gr_header_center">
+                    <t t-if="logo_bin">
+                        <img t-att-src="image_data_uri(logo_bin)" class="gr_logo_img"/>
+                    </t>
+                    <t t-if="not company.x_gr_logo_includes_wordmark">
+                        <div class="gr_wordmark">GETTING READY</div>
+                        <div class="gr_subwordmark">Vanity Experience</div>
+                    </t>
+                </td>
+                <td class="gr_header_right">
+                    <div><span class="gr_header_label">FECHA DE COT.: </span><t t-esc="doc._gr_format_date(doc.date_order)"/></div>
+                    <div><span class="gr_header_label">COTIZACIÓN: </span><t t-esc="doc.name"/></div>
+                </td>
+            </tr>
+        </table>
+        <div class="gr_hr_thin"/>
+    </template>
+
+    <!-- ================================================================
+         Client contact + event + assembly/disassembly block.
+    ================================================================= -->
+    <template id="gr_quotation_client_event">
+        <t t-set="contracting" t-value="doc._gr_get_contracting_partner()"/>
+        <table class="gr_info_table">
+            <tr>
+                <td class="gr_info_left">
+                    <div class="gr_label">CONTRATANTE:</div>
+                    <div class="gr_value" t-esc="contracting.name or ''"/>
+                    <div class="gr_label">TELÉFONO/CELULAR:</div>
+                    <div class="gr_value" t-esc="doc._gr_get_contact_phone()"/>
+                    <div class="gr_label">CORREO:</div>
+                    <div class="gr_value" t-esc="doc._gr_get_contact_email()"/>
+                    <div class="gr_label">COORDINACIÓN/WEDDING PLANNER:</div>
+                    <div class="gr_value" t-esc="doc.x_event_coordinator or ''"/>
+                    <div class="gr_label">TIPO DE EVENTO:</div>
+                    <div class="gr_value" style="margin-bottom: 0;" t-esc="doc.x_event_type_id.name or ''"/>
+                </td>
+                <td class="gr_info_spacer"/>
+                <td class="gr_info_right">
+                    <div class="gr_box_white">
+                        <div class="gr_label">FECHA DE EVENTO:</div>
+                        <div class="gr_value" t-esc="doc._gr_format_date(doc.x_event_start)"/>
+                        <table class="gr_subgrid">
+                            <tr>
+                                <td class="gr_half">
+                                    <div class="gr_label">FECHA DE MONTAJE:</div>
+                                    <div class="gr_value" style="margin-bottom: 0;" t-esc="doc._gr_format_date(doc.x_block_start)"/>
+                                </td>
+                                <td class="gr_half">
+                                    <div class="gr_label">FECHA DE DESMONTAJE:</div>
+                                    <div class="gr_value" style="margin-bottom: 0;" t-esc="doc._gr_format_date(doc.x_block_end)"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="gr_box_white gr_box_venue">
+                        <div class="gr_label">DIRECCIÓN DEL MONTAJE:</div>
+                        <div class="gr_value gr_value_block" t-esc="doc.x_event_location or ''"/>
+                        <div class="gr_label">TELÉFONO DE CONTACTO ADICIONAL:</div>
+                        <div class="gr_value" style="margin-bottom: 0;" t-esc="doc.x_additional_contact_phone or ''"/>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="gr_hr_thin"/>
+    </template>
+
+    <!-- ================================================================
+         Products table. Any number of lines; sections/notes render as a
+         full-width row instead of a product row; down payment lines are
+         not shown as furniture.
+    ================================================================= -->
+    <template id="gr_quotation_products">
+        <table class="gr_products_table">
+            <colgroup>
+                <col style="width:7%"/>
+                <col style="width:15%"/>
+                <col style="width:29%"/>
+                <col style="width:13%"/>
+                <col style="width:11%"/>
+                <col style="width:12%"/>
+                <col style="width:13%"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="gr_th_center">CANT.</th>
+                    <th/>
+                    <th>ARTÍCULO</th>
+                    <th class="gr_th_center">DURACIÓN</th>
+                    <th class="gr_th_right">PRECIO</th>
+                    <th class="gr_th_center">IMPUESTO</th>
+                    <th class="gr_th_right">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="doc.order_line" t-as="line">
+                    <t t-if="line.display_type == 'line_section'">
+                        <tr class="gr_row_section"><td colspan="7" t-esc="line.name"/></tr>
+                    </t>
+                    <t t-elif="line.display_type == 'line_note'">
+                        <tr class="gr_row_note"><td colspan="7" t-esc="line.name"/></tr>
+                    </t>
+                    <t t-elif="not line.is_downpayment">
+                        <tr class="gr_row_product">
+                            <td class="gr_td_center" t-esc="line.x_gr_qty_label"/>
+                            <td class="gr_td_center">
+                                <t t-if="line.product_id.image_128">
+                                    <img t-att-src="image_data_uri(line.product_id.image_128)" class="gr_product_img"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="gr_img_placeholder"/>
+                                </t>
+                            </td>
+                            <td>
+                                <div class="gr_article_title" t-esc="line.x_gr_article_title"/>
+                                <div t-if="line.x_gr_article_extra" class="gr_article_extra" t-esc="line.x_gr_article_extra"/>
+                            </td>
+                            <td class="gr_td_center" t-esc="line.x_gr_duration_label"/>
+                            <td class="gr_td_right">
+                                <span t-field="line.x_gr_price_after_discount"
+                                      t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                            <td class="gr_td_center" t-esc="line.x_gr_tax_label"/>
+                            <td class="gr_td_right">
+                                <span t-field="line.price_total"
+                                      t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                    </t>
+                </t>
+            </tbody>
+        </table>
+    </template>
+
+    <!-- ================================================================
+         Economic summary: subtotal, discounts, tax, paid, overpayment.
+    ================================================================= -->
+    <template id="gr_quotation_summary">
+        <table class="gr_summary_wrap">
+            <tr>
+                <td class="gr_summary_spacer"/>
+                <td class="gr_summary_col">
+                    <table class="gr_summary_table">
+                        <tr>
+                            <td class="gr_summary_label">SUBTOTAL</td>
+                            <td class="gr_summary_value">
+                                <span t-field="doc.x_amount_gross_subtotal" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="gr_summary_label">DESCUENTOS:</td>
+                            <td class="gr_summary_value">
+                                <span t-field="doc.x_amount_discount_total" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr class="gr_summary_strong">
+                            <td class="gr_summary_label">TOTAL:</td>
+                            <td class="gr_summary_value">
+                                <span t-field="doc.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="gr_summary_label">I.V.A</td>
+                            <td class="gr_summary_value">
+                                <span t-field="doc.amount_tax" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr class="gr_summary_strong">
+                            <td class="gr_summary_label">TOTAL INCL. I.V.A.</td>
+                            <td class="gr_summary_value">
+                                <span t-field="doc.amount_total" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="gr_summary_label">PAGADO</td>
+                            <td class="gr_summary_value">
+                                <span t-field="doc.x_amount_paid" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr class="gr_summary_strong">
+                            <td class="gr_summary_label">EXCEDENTE</td>
+                            <td class="gr_summary_value">
+                                <span t-field="doc.x_amount_overpaid" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div class="gr_hr_thick"/>
+    </template>
+
+    <!-- ================================================================
+         Policies: configurable via gr.quotation.policy, frozen on confirm.
+    ================================================================= -->
+    <template id="gr_quotation_policies">
+        <div class="gr_policies_wrap">
+            <div class="gr_policies_title">Políticas</div>
+            <t t-out="doc._gr_get_policies_html()"/>
+        </div>
+    </template>
+
+    <!-- ================================================================
+         Physical signature spaces (no signature image is invented here).
+    ================================================================= -->
+    <template id="gr_quotation_signatures">
+        <table class="gr_sign_wrap">
+            <tr>
+                <td class="gr_sign_cell">
+                    <div class="gr_sign_line"/>
+                    <div class="gr_sign_title">Enterado</div>
+                    <div class="gr_sign_legend">*Confirmo que leí y acepto las políticas y términos de esta cotización</div>
+                </td>
+                <td class="gr_sign_gap"/>
+                <td class="gr_sign_cell">
+                    <div class="gr_sign_line"/>
+                    <div class="gr_sign_title">Entregado</div>
+                    <div class="gr_sign_legend">*Confirmo que el equipo de Getting Ready entregó y colocó el mobiliario en buenas condiciones</div>
+                </td>
+            </tr>
+        </table>
+    </template>
+
+    <!-- ================================================================
+         Corporate footer, shown once at the end of the document only.
+    ================================================================= -->
+    <template id="gr_quotation_corporate_footer">
+        <t t-set="company" t-value="doc.company_id"/>
+        <div class="gr_corp_footer">
+            <t t-if="company.x_gr_quotation_logo or company.logo">
+                <img t-att-src="image_data_uri(company.x_gr_quotation_logo or company.logo)" class="gr_corp_logo"/>
+            </t>
+            <div class="gr_corp_name" t-esc="company.name"/>
+            <div t-if="company.street" t-esc="company.street"/>
+            <div t-if="company.street2" t-esc="company.street2"/>
+            <div t-esc="company._gr_footer_locality()"/>
+            <div t-esc="company._gr_footer_contact_line()"/>
+        </div>
+    </template>
+
+</odoo>

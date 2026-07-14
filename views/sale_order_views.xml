@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_gr_quotation_report" model="ir.ui.view">
+        <field name="name">sale.order.form.gr.quotation.report</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="aq_rental_serial_planning.view_order_form_serial_planning"/>
+        <field name="arch" type="xml">
+            <!-- New fields needed only by the GR quotation report, grouped
+                 together with the event fields already added by
+                 aq_rental_serial_planning ("Evento y Periodos" page). -->
+            <xpath expr="//page[@name='event_periods']//field[@name='x_event_location']" position="after">
+                <field name="x_contracting_partner_id"/>
+                <field name="x_event_coordinator"/>
+                <field name="x_additional_contact_phone"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

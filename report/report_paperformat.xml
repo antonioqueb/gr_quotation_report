@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dedicated Letter/vertical paper format for the GR quotation report.
+         Header/footer are disabled by NOT inheriting web.external_layout in
+         the template (see gr_quotation_report_templates.xml): the template
+         builds the full page itself, so there is no separate "disable
+         header" flag to set here. -->
+    <record id="paperformat_gr_quotation" model="report.paperformat">
+        <field name="name">Getting Ready - Cotización (Carta)</field>
+        <field name="default" eval="False"/>
+        <field name="format">us_letter</field>
+        <field name="page_height">279.4</field>
+        <field name="page_width">216</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">11</field>
+        <field name="margin_bottom">11</field>
+        <field name="margin_left">13</field>
+        <field name="margin_right">13</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">150</field>
+        <field name="disable_shrinking" eval="True"/>
+    </record>
+</odoo>
