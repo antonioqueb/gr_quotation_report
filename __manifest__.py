@@ -1,6 +1,6 @@
 {
     "name": "GR - Reporte de Cotización",
-    "version": "19.0.3.0.0",
+    "version": "19.0.4.0.0",
     "category": "Sales/Sales",
     "summary": "Cotización PDF editorial de Getting Ready para órdenes de venta/renta",
     "description": """
@@ -16,15 +16,18 @@ solo se le cambian ``report_name``/``paperformat_id``), de modo que Imprimir,
 Enviar por correo y la vista previa usan automáticamente este diseño sin
 tocar plantillas de correo ni desvincular nada.
 
-* Formato de página propio (Carta, sin encabezado/pie estándar de Odoo).
-* Encabezado con cliente, folio y fecha.
+* Usa el layout de encabezado/pie POR DEFECTO de Odoo (``web.external_layout``,
+  configurable en Ajustes > Diseño de Documentos), con logo, dirección de la
+  compañía, texto de pie y numeración de página automáticos en cada hoja.
+* Fila de "informaciones" con folio y fecha de cotización (mismo patrón que
+  el reporte estándar de venta).
 * Bloque de contratante / evento / montaje-desmontaje.
 * Tabla de productos con fotografía, duración, precio, impuestos y total
   (cantidad de líneas dinámica).
 * Resumen económico (subtotal, descuentos, impuestos, pagado, excedente).
 * Políticas comerciales configurables (modelo ``gr.quotation.policy``), con
   copia congelada al confirmar la cotización.
-* Espacios de firma física y pie corporativo tomado de ``res.company``.
+* Espacios de firma física.
 """,
     "author": "AlphaQueb",
     "website": "https://alphaqueb.com",
@@ -39,7 +42,6 @@ tocar plantillas de correo ni desvincular nada.
         "report/ir_actions_report.xml",
         "data/gr_quotation_policy_data.xml",
         "views/gr_quotation_policy_views.xml",
-        "views/res_company_views.xml",
         "views/sale_order_views.xml",
     ],
     "application": False,

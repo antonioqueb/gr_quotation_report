@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Dedicated Letter/vertical paper format for the GR quotation report.
-         Header/footer are disabled by NOT inheriting web.external_layout in
-         the template (see gr_quotation_report_templates.xml): the template
-         builds the full page itself, so there is no separate "disable
-         header" flag to set here. -->
+         The report uses Odoo's default header/footer (web.external_layout),
+         so margin_top/margin_bottom/header_spacing must leave enough room
+         for the company logo+address header and the footer+page-number
+         band to render without overlapping the body content - the same
+         role these fields play for any standard Odoo report. -->
     <!-- format='Letter' already fixes the physical page to 215.9 x 279.4 mm
          (8.5x11in ~ 216x279.4mm requested). page_width/page_height must stay
          empty: report.paperformat forbids combining a named format with an
@@ -14,12 +15,12 @@
         <field name="default" eval="False"/>
         <field name="format">Letter</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">11</field>
-        <field name="margin_bottom">11</field>
+        <field name="margin_top">35</field>
+        <field name="margin_bottom">18</field>
         <field name="margin_left">13</field>
         <field name="margin_right">13</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">0</field>
+        <field name="header_spacing">10</field>
         <field name="dpi">150</field>
         <field name="disable_shrinking" eval="True"/>
     </record>

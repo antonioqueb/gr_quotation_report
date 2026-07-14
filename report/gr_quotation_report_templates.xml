@@ -2,9 +2,14 @@
 <odoo>
 
     <!-- ================================================================
-         Root template. No web.external_layout is used on purpose: it would
-         bring back Odoo's standard commercial header/footer. The page is
-         built entirely by this module's own markup, per doc.
+         Root template. Uses Odoo's DEFAULT header/footer layout
+         (web.external_layout, i.e. whatever the company has configured
+         under Settings > General Settings > Document Layout: Standard /
+         Boxed / Bold / Striped) instead of a fully custom one. That layout
+         already gives us, on every page: company logo, address/tagline in
+         the header, and company footer text + page numbers in the footer.
+         Only the content in between ("informations" row, client/event
+         block, products, summary, policies, signatures) is ours.
     ================================================================= -->
     <template id="report_gr_quotation_document">
         <!-- web.report_layout renders <body class="container"> (Bootstrap,
@@ -17,15 +22,29 @@
         <t t-call="web.html_container">
             <t t-call="gr_quotation_report.gr_quotation_style"/>
             <t t-foreach="docs" t-as="doc">
-                <t t-call="web.basic_layout">
-                    <div class="gr_doc">
-                        <t t-call="gr_quotation_report.gr_quotation_header"/>
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+                <t t-call="web.external_layout">
+                    <t t-set="address">
+                        <span class="gr_address_label">CLIENTE</span>
+                        <div t-field="doc.partner_id"
+                             t-options="{'widget': 'contact', 'fields': ['address', 'name'], 'no_marker': True}"/>
+                    </t>
+                    <t t-set="layout_document_title">
+                        <span>Cotización # </span>
+                        <span t-field="doc.name">SO0000</span>
+                    </t>
+                    <div class="page gr_doc">
+                        <div class="row mb-4" id="informations">
+                            <div class="col" name="gr_informations_date">
+                                <strong>Fecha de cotización</strong>
+                                <div t-esc="doc._gr_format_date(doc.date_order)"/>
+                            </div>
+                        </div>
                         <t t-call="gr_quotation_report.gr_quotation_client_event"/>
                         <t t-call="gr_quotation_report.gr_quotation_products"/>
                         <t t-call="gr_quotation_report.gr_quotation_summary"/>
                         <t t-call="gr_quotation_report.gr_quotation_policies"/>
                         <t t-call="gr_quotation_report.gr_quotation_signatures"/>
-                        <t t-call="gr_quotation_report.gr_quotation_corporate_footer"/>
                     </div>
                 </t>
                 <t t-if="not doc_last">
@@ -88,29 +107,13 @@
             .gr_doc table { border-collapse: collapse; }
             .gr_doc td, .gr_doc th { vertical-align: top; }
 
-            /* ---- header ----
-               table-layout: fixed makes the 32/36/32 split immune to content
-               length (a long client name or a long date/folio can no longer
-               push the browser's automatic column-sizing to re-balance the
-               row and throw the centered logo off-center). */
-            .gr_header_table { width: 100%; table-layout: fixed; margin-bottom: 3mm; }
-            .gr_header_left { width: 32%; text-align: left; vertical-align: middle; overflow-wrap: break-word; }
-            .gr_header_center { width: 36%; text-align: center; vertical-align: middle; }
-            .gr_header_right { width: 32%; text-align: right; vertical-align: middle; font-size: 10pt; }
-            .gr_header_label { color: #111111; font-weight: bold; }
-            .gr_header_client {
-                color: #BDAA9F; font-weight: bold; text-transform: uppercase;
-                font-size: 10.5pt;
+            /* Label for the client block shown in web.external_layout's
+               native "address" slot (top of the default header). */
+            .gr_address_label {
+                display: block; font-weight: bold; color: #111111;
+                font-size: 8pt; text-transform: uppercase; margin-bottom: 0.5mm;
             }
-            .gr_logo_img { max-width: 62mm; max-height: 30mm; display: block; margin: 0 auto; }
-            .gr_wordmark {
-                font-weight: bold; letter-spacing: 2px; text-transform: uppercase;
-                font-size: 15pt; margin-top: 1mm;
-            }
-            .gr_subwordmark {
-                font-size: 7pt; letter-spacing: 1.5px; text-transform: uppercase;
-                color: #333333; margin-top: 0.5mm;
-            }
+
             .gr_hr_thin { height: 1px; background-color: #111111; margin: 0 0 4mm 0; }
             .gr_hr_thick { height: 1px; background-color: #111111; margin: 4mm 0 4mm 0; }
 
@@ -196,48 +199,7 @@
                 margin-top: 1.5mm;
             }
             .gr_sign_legend { font-size: 6.8pt; color: #333333; margin-top: 1mm; }
-
-            /* ---- corporate footer ---- */
-            .gr_corp_footer {
-                margin-top: 11mm; text-align: center; font-size: 8pt; color: #333333;
-                page-break-inside: avoid;
-            }
-            .gr_corp_logo { max-height: 14mm; margin: 0 auto 2mm auto; display: block; }
-            .gr_corp_name { font-weight: bold; color: #111111; }
         </style>
-    </template>
-
-    <!-- ================================================================
-         Header: only rendered once, at the top of each order's document
-         (normal block flow, not a running page header).
-    ================================================================= -->
-    <template id="gr_quotation_header">
-        <t t-set="company" t-value="doc.company_id"/>
-        <t t-set="logo_bin" t-value="company.x_gr_quotation_logo or company.logo"/>
-        <table class="gr_header_table">
-            <tr>
-                <td class="gr_header_left">
-                    <span class="gr_header_label">CLIENTE: </span>
-                    <t t-if="doc.partner_id.name">
-                        <span class="gr_header_client" t-esc="doc.partner_id.name.upper()"/>
-                    </t>
-                </td>
-                <td class="gr_header_center">
-                    <t t-if="logo_bin">
-                        <img t-att-src="image_data_uri(logo_bin)" class="gr_logo_img"/>
-                    </t>
-                    <t t-if="not company.x_gr_logo_includes_wordmark">
-                        <div class="gr_wordmark">GETTING READY</div>
-                        <div class="gr_subwordmark">Vanity Experience</div>
-                    </t>
-                </td>
-                <td class="gr_header_right">
-                    <div><span class="gr_header_label">FECHA DE COT.: </span><t t-esc="doc._gr_format_date(doc.date_order)"/></div>
-                    <div><span class="gr_header_label">COTIZACIÓN: </span><t t-esc="doc.name"/></div>
-                </td>
-            </tr>
-        </table>
-        <div class="gr_hr_thin"/>
     </template>
 
     <!-- ================================================================
@@ -445,21 +407,5 @@
         </table>
     </template>
 
-    <!-- ================================================================
-         Corporate footer, shown once at the end of the document only.
-    ================================================================= -->
-    <template id="gr_quotation_corporate_footer">
-        <t t-set="company" t-value="doc.company_id"/>
-        <div class="gr_corp_footer">
-            <t t-if="company.x_gr_quotation_logo or company.logo">
-                <img t-att-src="image_data_uri(company.x_gr_quotation_logo or company.logo)" class="gr_corp_logo"/>
-            </t>
-            <div class="gr_corp_name" t-esc="company.name"/>
-            <div t-if="company.street" t-esc="company.street"/>
-            <div t-if="company.street2" t-esc="company.street2"/>
-            <div t-esc="company._gr_footer_locality()"/>
-            <div t-esc="company._gr_footer_contact_line()"/>
-        </div>
-    </template>
 
 </odoo>
