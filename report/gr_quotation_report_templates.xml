@@ -128,42 +128,48 @@
                 box-sizing: border-box;
                 line-height: 1.35;
             }
-            /* Hard reset: tables are used only to POSITION content (columns,
-               alignment), never to draw a grid. Every cell/table starts
-               borderless; the few intentional lines below (thead rule,
-               section dividers, the grand-total rule, signature lines) are
-               added back explicitly, one at a time, so nothing is ever
-               bordered "by accident". */
-            .gr_doc table, .gr_doc th, .gr_doc td {
-                border: none; border-collapse: collapse;
-            }
+            /* Root cause of the "Excel grid" look: web.external_layout tags
+               the .article with the company's document-layout class
+               (o_table_standard/bold/striped/boxed), whose CSS decorates
+               EVERY table inside the report - full cell borders, striped
+               row backgrounds, uppercase heads, and (Boxed) an outer frame
+               drawn with a ::before pseudo-element that a plain border
+               reset cannot remove. Our tables opt out through Odoo's
+               official escape hatch: each carries the
+               "o_ignore_layout_styling" class, which every one of those
+               rules excludes. The ::before frame is also neutralized here
+               as a second net. */
+            .gr_doc table::before { content: none !important; border: none !important; }
+            .gr_doc table { border-collapse: collapse; }
             .gr_doc td, .gr_doc th { vertical-align: top; }
 
             .gr_hr_thin { height: 1px; background-color: #111111; margin: 0 0 4mm 0; }
             .gr_hr_thick { height: 1px; background-color: #111111; margin: 4mm 0 4mm 0; }
 
-            /* ---- client / event block ----
-               No boxes, no borders: the left column keeps a very soft
-               background tint (not a border) to read as one group; the
-               right column is plain white, separated purely by whitespace
-               and label/value typography. */
-            .gr_info_table { width: 100%; table-layout: fixed; margin-bottom: 4mm; }
+            /* ---- client / event block ---- (design as per the reference
+               PDF: soft beige panel + thin light-gray outlines, exactly the
+               first-version look) */
+            .gr_info_table { width: 100%; table-layout: fixed; margin-bottom: 3mm; }
             .gr_info_left {
-                width: 51%; background-color: #F4F1EF;
-                padding: 4mm; vertical-align: top; overflow-wrap: break-word;
+                width: 51%; background-color: #F4F1EF; border: 1px solid #C9C9C9;
+                padding: 2.8mm; vertical-align: top; overflow-wrap: break-word;
             }
-            .gr_info_spacer { width: 4%; }
-            .gr_info_right { width: 45%; vertical-align: top; padding: 1mm 0; }
-            .gr_box_venue { margin-top: 5mm; }
+            .gr_info_spacer { width: 1%; }
+            .gr_info_right { width: 48%; vertical-align: top; padding: 0; }
+            .gr_box_white {
+                border: 1px solid #C9C9C9; background-color: #ffffff;
+                padding: 2.5mm; vertical-align: top;
+            }
+            .gr_box_venue { margin-top: 1.5mm; }
             .gr_subgrid { width: 100%; table-layout: fixed; margin-top: 1mm; }
             .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; }
             .gr_label {
                 display: block; font-size: 7pt; text-transform: uppercase;
-                letter-spacing: 0.3px; color: #333333; margin-bottom: 0.5mm;
+                color: #111111; margin-bottom: 0.3mm;
             }
             .gr_value {
                 display: block; font-size: 10.5pt; font-weight: bold; font-style: italic;
-                color: #111111; margin-bottom: 2.5mm;
+                color: #111111; margin-bottom: 1.8mm;
             }
             .gr_value_block { white-space: pre-line; }
 
@@ -191,22 +197,15 @@
             }
             .gr_row_note td { font-style: italic; color: #333333; }
 
-            /* ---- summary ----
-               Wide, right-aligned, no grid: rows are just label/value pairs
-               with generous vertical rhythm. Only the grand total ("TOTAL
-               INCL. I.V.A.") is emphasized, via a top rule and bolder type -
-               every other row stays the same quiet weight. */
-            .gr_summary_wrap { width: 100%; table-layout: fixed; margin-top: 5mm; page-break-inside: avoid; }
-            .gr_summary_spacer { width: 38%; }
-            .gr_summary_col { width: 62%; vertical-align: top; }
+            /* ---- summary ---- (first-version look) */
+            .gr_summary_wrap { width: 100%; table-layout: fixed; margin-top: 4mm; page-break-inside: avoid; }
+            .gr_summary_spacer { width: 55%; }
+            .gr_summary_col { width: 45%; vertical-align: top; }
             .gr_summary_table { width: 100%; }
-            .gr_summary_table td { padding: 1.4mm 0; font-size: 9.5pt; }
-            .gr_summary_label { text-align: right; font-style: italic; color: #333333; padding-right: 4mm !important; white-space: nowrap; }
+            .gr_summary_table td { padding: 1.1mm 0; font-size: 9pt; }
+            .gr_summary_label { text-align: right; font-style: italic; padding-right: 3mm !important; white-space: nowrap; }
             .gr_summary_value { text-align: right; white-space: nowrap; }
-            .gr_summary_grand td {
-                border-top: 1px solid #111111; padding-top: 2.6mm !important;
-                margin-top: 1.4mm; font-weight: bold; font-style: italic; font-size: 11pt;
-            }
+            .gr_summary_strong td { font-weight: bold; font-style: italic; }
 
             /* ---- policies ---- */
             .gr_policies_wrap { margin-top: 2mm; }
@@ -239,7 +238,7 @@
     ================================================================= -->
     <template id="gr_quotation_client_event">
         <t t-set="contracting" t-value="doc._gr_get_contracting_partner()"/>
-        <table class="gr_info_table">
+        <table class="gr_info_table o_ignore_layout_styling">
             <tr>
                 <td class="gr_info_left">
                     <div class="gr_label">CONTRATANTE:</div>
@@ -255,10 +254,10 @@
                 </td>
                 <td class="gr_info_spacer"/>
                 <td class="gr_info_right">
-                    <div>
+                    <div class="gr_box_white">
                         <div class="gr_label">FECHA DE EVENTO:</div>
                         <div class="gr_value" t-esc="doc._gr_format_date(doc.x_event_start)"/>
-                        <table class="gr_subgrid">
+                        <table class="gr_subgrid o_ignore_layout_styling">
                             <tr>
                                 <td class="gr_half">
                                     <div class="gr_label">FECHA DE MONTAJE:</div>
@@ -271,7 +270,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="gr_box_venue">
+                    <div class="gr_box_white gr_box_venue">
                         <div class="gr_label">DIRECCIÓN DEL MONTAJE:</div>
                         <div class="gr_value gr_value_block" t-esc="doc.x_event_location or ''"/>
                         <div class="gr_label">TELÉFONO DE CONTACTO ADICIONAL:</div>
@@ -289,7 +288,7 @@
          not shown as furniture.
     ================================================================= -->
     <template id="gr_quotation_products">
-        <table class="gr_products_table">
+        <table class="gr_products_table o_ignore_layout_styling">
             <colgroup>
                 <col style="width:7%"/>
                 <col style="width:15%"/>
@@ -354,11 +353,11 @@
          Economic summary: subtotal, discounts, tax, paid, overpayment.
     ================================================================= -->
     <template id="gr_quotation_summary">
-        <table class="gr_summary_wrap">
+        <table class="gr_summary_wrap o_ignore_layout_styling">
             <tr>
                 <td class="gr_summary_spacer"/>
                 <td class="gr_summary_col">
-                    <table class="gr_summary_table">
+                    <table class="gr_summary_table o_ignore_layout_styling">
                         <tr>
                             <td class="gr_summary_label">SUBTOTAL</td>
                             <td class="gr_summary_value">
@@ -371,7 +370,7 @@
                                 <span t-field="doc.x_amount_discount_total" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="gr_summary_strong">
                             <td class="gr_summary_label">TOTAL:</td>
                             <td class="gr_summary_value">
                                 <span t-field="doc.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
@@ -383,7 +382,7 @@
                                 <span t-field="doc.amount_tax" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
                             </td>
                         </tr>
-                        <tr class="gr_summary_grand">
+                        <tr class="gr_summary_strong">
                             <td class="gr_summary_label">TOTAL INCL. I.V.A.</td>
                             <td class="gr_summary_value">
                                 <span t-field="doc.amount_total" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
@@ -395,7 +394,7 @@
                                 <span t-field="doc.x_amount_paid" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="gr_summary_strong">
                             <td class="gr_summary_label">EXCEDENTE</td>
                             <td class="gr_summary_value">
                                 <span t-field="doc.x_amount_overpaid" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
@@ -422,7 +421,7 @@
          Physical signature spaces (no signature image is invented here).
     ================================================================= -->
     <template id="gr_quotation_signatures">
-        <table class="gr_sign_wrap">
+        <table class="gr_sign_wrap o_ignore_layout_styling">
             <tr>
                 <td class="gr_sign_cell">
                     <div class="gr_sign_line"/>
