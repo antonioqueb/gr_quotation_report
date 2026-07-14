@@ -92,36 +92,49 @@
             .gr_doc table { border-collapse: collapse; }
             .gr_doc td, .gr_doc th { vertical-align: top; }
 
-            /* Black rules of the reference (0.25mm). The first one closes
-               the info panels at ~97.3mm from the page top: panels end at
-               ~94.4mm, +2.9mm gap. */
-            .gr_hr_thin { height: 0.25mm; background-color: #111111; margin: 2.9mm 0 0 0; }
+            /* Black rules (0.25mm). gr_hr_top opens the general-information
+               block right where the body starts; gr_hr_thin closes it. The
+               cards span the full useful width, so their outer edges stay
+               aligned with both rules and the whole block reads as one
+               unit. */
+            .gr_hr_top { height: 0.25mm; background-color: #111111; margin: 0 0 2.2mm 0; }
+            .gr_hr_thin { height: 0.25mm; background-color: #111111; margin: 2.4mm 0 0 0; }
             .gr_hr_thick { height: 0.25mm; background-color: #111111; margin: 4mm 0 4mm 0; }
 
-            /* ---- client / event panels ----
-               96.4mm + 2mm + 92.1mm over a 190.6mm useful width. */
+            /* ---- general information (client / event cards) ----
+               Two near-symmetric columns (96.4mm + 2mm + 92.1mm over the
+               190.6mm useful width): one tall card on the left (warm beige
+               background), two stacked white cards on the right. Flat 1px
+               light-gray borders, square corners, compact padding. Heights
+               are minimums: the label/value pairs keep their slot even
+               when a field is empty. */
             .gr_info_table { width: 100%; table-layout: fixed; }
             .gr_info_left {
-                width: 96.4mm; height: 44.8mm;
-                background-color: #F2EEEC; border: 0.2mm solid #CCCCCC;
-                padding: 1.6mm; vertical-align: top; overflow-wrap: break-word;
+                width: 96.4mm;
+                background-color: #F2EEEC; border: 1px solid #CCCCCC;
+                padding: 2.8mm; vertical-align: top; overflow-wrap: break-word;
             }
             .gr_info_spacer { width: 2mm; }
             .gr_info_right { width: 92.1mm; vertical-align: top; padding: 0; }
             .gr_box_white {
-                min-height: 22.4mm; background-color: #ffffff;
-                border: 0.2mm solid #CCCCCC; padding: 1.6mm;
+                min-height: 24mm; background-color: #ffffff;
+                border: 1px solid #CCCCCC; padding: 2.8mm;
             }
-            .gr_box_venue { min-height: 21mm; background-color: #FAFAF8; margin-top: 1.2mm; }
-            .gr_subgrid { width: 100%; table-layout: fixed; margin-top: 1mm; }
-            .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; }
+            .gr_box_venue { min-height: 22mm; margin-top: 1.6mm; }
+            .gr_subgrid { width: 100%; table-layout: fixed; margin-top: 1.2mm; }
+            .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; padding-right: 2mm; }
+            /* Two-level hierarchy: small uppercase regular labels
+               (~12.5px), much larger bold-italic values (~20.5px), tight
+               leading so the block stays compact. */
             .gr_label {
-                display: block; font-size: 6.8pt; text-transform: uppercase;
-                color: #111111; margin-bottom: 0.3mm;
+                display: block; font-size: 9.4pt; font-weight: normal;
+                text-transform: uppercase; color: #111111;
+                line-height: 1.1; margin-bottom: 0.4mm;
             }
             .gr_value {
-                display: block; font-size: 10.2pt; font-weight: bold; font-style: italic;
-                color: #111111; margin-bottom: 1.4mm;
+                display: block; font-size: 15.4pt; font-weight: bold; font-style: italic;
+                color: #111111; line-height: 1.05; min-height: 5.8mm;
+                margin-bottom: 1.6mm;
             }
             .gr_value_block { white-space: pre-line; }
 
@@ -200,6 +213,7 @@
     ================================================================= -->
     <template id="gr_quotation_client_event">
         <t t-set="contracting" t-value="doc._gr_get_contracting_partner()"/>
+        <div class="gr_hr_top"/>
         <table class="gr_info_table o_ignore_layout_styling">
             <tr>
                 <td class="gr_info_left">
