@@ -17,7 +17,6 @@
              edge-to-edge like the PDF. -->
         <t t-set="full_width" t-value="1"/>
         <t t-call="web.html_container">
-            <t t-call="gr_quotation_report.gr_quotation_style"/>
             <t t-foreach="docs" t-as="doc">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
                 <!-- o/company are normally set by web.external_layout before
@@ -27,6 +26,13 @@
                 <t t-set="company" t-value="doc.company_id.sudo()"/>
                 <t t-call="gr_quotation_report.gr_external_layout_standard">
                     <div class="page gr_doc">
+                        <!-- The style block MUST live here, inside the
+                             .article: when building the PDF, Odoo extracts
+                             only the article node and re-renders it inside
+                             web.minimal_layout, so anything outside it
+                             (like a style tag next to html_container)
+                             never reaches the printed pages. -->
+                        <t t-call="gr_quotation_report.gr_quotation_style"/>
                         <t t-call="gr_quotation_report.gr_quotation_client_event"/>
                         <t t-call="gr_quotation_report.gr_quotation_products"/>
                         <t t-call="gr_quotation_report.gr_quotation_summary"/>
@@ -75,6 +81,17 @@
                 font-family: 'Nunito';
                 src: url('/gr_quotation_report/static/src/fonts/Nunito-BoldItalic.woff') format('woff');
                 font-weight: bold; font-style: italic;
+            }
+
+            /* web.minimal_layout hardcodes class="container" on the PDF
+               body; at a Letter-width viewport Bootstrap caps .container
+               at ~540px, squeezing the content to ~75% and pinning it
+               left. This rule only exists inside THIS report's article
+               (the style tag travels with it into the PDF sub-document),
+               so no other report is affected. */
+            body.o_body_pdf {
+                width: 100% !important; max-width: none !important;
+                margin: 0 !important; padding: 0 !important;
             }
 
             .gr_doc {

@@ -1,6 +1,6 @@
 {
     "name": "GR - Reporte de Cotización",
-    "version": "19.0.20.0.0",
+    "version": "19.0.21.0.0",
     "category": "Sales/Sales",
     "summary": "Cotización PDF editorial de Getting Ready para órdenes de venta/renta",
     "description": """
