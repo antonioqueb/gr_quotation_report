@@ -24,11 +24,14 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
                 <t t-call="web.external_layout">
-                    <t t-set="address">
-                        <span class="gr_address_label">CLIENTE</span>
-                        <div t-field="doc.partner_id"
-                             t-options="{'widget': 'contact', 'fields': ['address', 'name'], 'no_marker': True}"/>
-                    </t>
+                    <!-- No "address" slot is set on purpose: the client's
+                         full contact details already have their own block
+                         further down (gr_quotation_client_event: CONTRATANTE,
+                         TELÉFONO, CORREO...), so showing a second, generic
+                         contact card up in the header was redundant. The
+                         company's own address block is hidden via CSS below
+                         ([name="company_address"]) per client request - the
+                         header keeps only the logo. -->
                     <t t-set="layout_document_title">
                         <span>Cotización # </span>
                         <span t-field="doc.name">SO0000</span>
@@ -82,6 +85,14 @@
                 font-weight: bold; font-style: italic;
             }
 
+            /* Client request: hide the company address block that Odoo's
+               default header layout (any of Standard/Boxed/Bold/Striped)
+               prints next to the logo. Every one of those layouts names
+               that block name="company_address", so this one rule covers
+               whichever the company has configured, without forking the
+               native template. Header keeps only the logo. */
+            [name="company_address"] { display: none !important; }
+
             /* Belt-and-suspenders: neutralize Bootstrap's .container max-width
                and gutters in case full_width isn't honored (e.g. a report
                composed/previewed through a code path that overrides it), so
@@ -106,13 +117,6 @@
             }
             .gr_doc table { border-collapse: collapse; }
             .gr_doc td, .gr_doc th { vertical-align: top; }
-
-            /* Label for the client block shown in web.external_layout's
-               native "address" slot (top of the default header). */
-            .gr_address_label {
-                display: block; font-weight: bold; color: #111111;
-                font-size: 8pt; text-transform: uppercase; margin-bottom: 0.5mm;
-            }
 
             .gr_hr_thin { height: 1px; background-color: #111111; margin: 0 0 4mm 0; }
             .gr_hr_thick { height: 1px; background-color: #111111; margin: 4mm 0 4mm 0; }
