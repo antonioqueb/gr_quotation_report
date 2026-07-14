@@ -93,6 +93,19 @@
                native template. Header keeps only the logo. */
             [name="company_address"] { display: none !important; }
 
+            /* Hard ceiling on the header/footer's own rendered height, on
+               top of (not instead of) the paperformat's margin_top /
+               margin_bottom / header_spacing. wkhtmltopdf renders the
+               header as a separate document reserved a fixed band at the
+               top of every page; if the header's real height ever exceeds
+               that band (a long tagline, an oversized uploaded logo...) it
+               is not clipped by wkhtmltopdf, it bleeds down and overlaps
+               the first lines of body content on every following page.
+               This clamp guarantees that can't happen regardless of data. */
+            .header { max-height: 28mm; overflow: hidden; }
+            .footer { max-height: 16mm; overflow: hidden; }
+            .o_company_logo_small { max-height: 16mm !important; }
+
             /* Belt-and-suspenders: neutralize Bootstrap's .container max-width
                and gutters in case full_width isn't honored (e.g. a report
                composed/previewed through a code path that overrides it), so
@@ -135,7 +148,11 @@
             }
             .gr_box_venue { margin-top: 1.5mm; }
             .gr_subgrid { width: 100%; table-layout: fixed; margin-top: 1mm; }
-            .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; }
+            /* FECHA DE MONTAJE / FECHA DE DESMONTAJE are two independent
+               cells with breathing room and a visible divider between them,
+               instead of sitting flush against each other. */
+            .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; padding-right: 3mm; }
+            .gr_half + .gr_half { padding-right: 0; padding-left: 3mm; border-left: 1px solid #C9C9C9; }
             .gr_label {
                 display: block; font-size: 7pt; text-transform: uppercase;
                 color: #111111; margin-bottom: 0.3mm;

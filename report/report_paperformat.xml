@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Dedicated Letter/vertical paper format for the GR quotation report.
-         The report uses Odoo's default header/footer (web.external_layout),
-         so margin_top/margin_bottom/header_spacing must leave enough room
-         for the company logo+address header and the footer+page-number
-         band to render without overlapping the body content - the same
-         role these fields play for any standard Odoo report. -->
+         The report uses Odoo's default header/footer (web.external_layout).
+         wkhtmltopdf renders the header as its OWN separate mini-document
+         (via the "header html" flag), reserved a "margin_top" mm tall band
+         at the top of *every* page; "header_spacing" mm is then an EXTRA gap
+         between the bottom of that band and the body content, on every
+         page too (this is a wkhtmltopdf page property, not a first-page-only
+         setting). If the header's real rendered height exceeds margin_top,
+         wkhtmltopdf does not clip it - it bleeds down into the body area,
+         which is exactly the page 2/3 overlap that was reported. Our header
+         now only shows the company logo (the address block is hidden via
+         CSS - see gr_quotation_report_templates.xml), so it is short, but
+         we still size margin_top/header_spacing with a comfortable safety
+         margin, AND clamp the header/footer's own CSS height as a hard
+         ceiling (belt and suspenders) rather than relying on this number
+         alone. Mirrors Odoo's own margin_top ~= header_spacing ratio (see
+         base.paperformat_us, 52/52) scaled down for our lighter header. -->
     <!-- format='Letter' already fixes the physical page to 215.9 x 279.4 mm
          (8.5x11in ~ 216x279.4mm requested). page_width/page_height must stay
          empty: report.paperformat forbids combining a named format with an
@@ -15,12 +26,12 @@
         <field name="default" eval="False"/>
         <field name="format">Letter</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">35</field>
-        <field name="margin_bottom">18</field>
+        <field name="margin_top">42</field>
+        <field name="margin_bottom">24</field>
         <field name="margin_left">13</field>
         <field name="margin_right">13</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">10</field>
+        <field name="header_spacing">8</field>
         <field name="dpi">150</field>
         <field name="disable_shrinking" eval="True"/>
     </record>
