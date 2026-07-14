@@ -241,7 +241,7 @@
                     <div class="gr_label">CORREO:</div>
                     <div class="gr_value" t-esc="doc._gr_get_contact_email()"/>
                     <div class="gr_label">COORDINACIÓN/WEDDING PLANNER:</div>
-                    <div class="gr_value" t-esc="doc.x_event_coordinator or ''"/>
+                    <div class="gr_value" t-esc="doc.x_event_coordinator_id.name or ''"/>
                     <div class="gr_label">TIPO DE EVENTO:</div>
                     <div class="gr_value" style="margin-bottom: 0;" t-esc="doc.x_event_type_id.name or ''"/>
                 </td>

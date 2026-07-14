@@ -25,7 +25,7 @@
                         </group>
                         <group string="Contacto y ubicación">
                             <field name="x_contracting_partner_id" string="Contratante"/>
-                            <field name="x_event_coordinator" string="Coordinación / Wedding Planner"/>
+                            <field name="x_event_coordinator_id" string="Coordinación / Wedding Planner"/>
                             <field name="x_event_location" string="Dirección del montaje"/>
                             <field name="x_additional_contact_phone" string="Teléfono de contacto adicional"/>
                         </group>

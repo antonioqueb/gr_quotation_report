@@ -70,7 +70,7 @@ class GrQuotationReportCommon(TransactionCase):
             "x_block_start": start - timedelta(hours=6),
             "x_block_end": end + timedelta(hours=6),
             "x_contracting_partner_id": self.coordinator_partner.id,
-            "x_event_coordinator": "Elemento 3",
+            "x_event_coordinator_id": self.coordinator_partner.id,
             "x_additional_contact_phone": "8112223344",
         }
         if currency:

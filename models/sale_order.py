@@ -22,9 +22,11 @@ class SaleOrder(models.Model):
         "res.partner", string="Contratante",
         help="Persona que contrata el evento cuando es distinta del cliente "
              "de la cotización. Si se deja vacío se usa 'Cliente'.")
-    x_event_coordinator = fields.Char(
-        string="Coordinación / Wedding Planner",
-        help="Nombre del coordinador o wedding planner a cargo del evento.")
+    x_event_coordinator_id = fields.Many2one(
+        "res.partner", string="Coordinación / Wedding Planner",
+        help="Contacto del coordinador o wedding planner a cargo del "
+             "evento. Se selecciona de la libreta de contactos, igual que "
+             "el contratante.")
     x_additional_contact_phone = fields.Char(
         string="Teléfono de contacto adicional",
         help="Teléfono adicional del lugar de montaje, mostrado en el PDF de "
