@@ -2,21 +2,21 @@
 <odoo>
     <!-- Dedicated Letter/vertical paper format for the GR quotation report.
          The report uses Odoo's default header/footer (web.external_layout).
-         wkhtmltopdf renders the header as its OWN separate mini-document
-         (via the "header html" flag), reserved a "margin_top" mm tall band
-         at the top of *every* page; "header_spacing" mm is then an EXTRA gap
-         between the bottom of that band and the body content, on every
-         page too (this is a wkhtmltopdf page property, not a first-page-only
-         setting). If the header's real rendered height exceeds margin_top,
-         wkhtmltopdf does not clip it - it bleeds down into the body area,
-         which is exactly the page 2/3 overlap that was reported. Our header
-         now only shows the company logo (the address block is hidden via
-         CSS - see gr_quotation_report_templates.xml), so it is short, but
-         we still size margin_top/header_spacing with a comfortable safety
-         margin, AND clamp the header/footer's own CSS height as a hard
-         ceiling (belt and suspenders) rather than relying on this number
-         alone. Mirrors Odoo's own margin_top ~= header_spacing ratio (see
-         base.paperformat_us, 52/52) scaled down for our lighter header. -->
+         wkhtmltopdf ties the HEADER's own vertical position to margin_top
+         (the header is drawn starting at that line, not floated above it),
+         so raising margin_top visibly pushes the header itself further down
+         the page - that is not what we want here. header_spacing is the
+         lever that pushes the BODY content further down *without* moving
+         the header: it is the gap inserted between the end of the header
+         and the start of body content, on every page (a wkhtmltopdf page
+         property, not a first-page-only setting). So: margin_top stays at
+         the value that keeps the header where it was, and header_spacing is
+         generous enough that body content - and, on later pages, the
+         continuation of the products table / policies - never starts
+         before the header has fully finished rendering. The header/footer
+         CSS max-height clamp (see gr_quotation_report_templates.xml) is the
+         second, independent safety net in case a company logo/tagline ever
+         renders taller than expected. -->
     <!-- format='Letter' already fixes the physical page to 215.9 x 279.4 mm
          (8.5x11in ~ 216x279.4mm requested). page_width/page_height must stay
          empty: report.paperformat forbids combining a named format with an
@@ -26,12 +26,12 @@
         <field name="default" eval="False"/>
         <field name="format">Letter</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">42</field>
-        <field name="margin_bottom">24</field>
+        <field name="margin_top">35</field>
+        <field name="margin_bottom">18</field>
         <field name="margin_left">13</field>
         <field name="margin_right">13</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">8</field>
+        <field name="header_spacing">22</field>
         <field name="dpi">150</field>
         <field name="disable_shrinking" eval="True"/>
     </record>
