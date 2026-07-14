@@ -9,9 +9,10 @@ GR Quotation Report
 
 Reporte QWeb dinámico "Cotización Getting Ready" para ``sale.order`` (renta de
 eventos), construido sobre los modelos y campos ya existentes en
-``aq_rental_serial_planning``. No reemplaza el reporte estándar de Odoo: se
-agrega como una acción de impresión adicional, disponible únicamente para las
-órdenes de venta/renta de Getting Ready.
+``aq_rental_serial_planning``. Por decisión explícita del cliente, este
+reporte reemplaza al reporte estándar de cotización de Odoo como acción de
+Imprimir/Enviar por correo en ``sale.order`` (el reporte estándar no se
+elimina, solo se desvincula de ese modelo).
 
 * Formato de página propio (Carta, sin encabezado/pie estándar de Odoo).
 * Encabezado con cliente, folio y fecha.
@@ -28,6 +29,7 @@ agrega como una acción de impresión adicional, disponible únicamente para las
     "license": "LGPL-3",
     "depends": [
         "aq_rental_serial_planning",
+        "mail",
     ],
     "data": [
         "security/ir.model.access.csv",
@@ -35,6 +37,7 @@ agrega como una acción de impresión adicional, disponible únicamente para las
         "report/gr_quotation_report_templates.xml",
         "report/ir_actions_report.xml",
         "data/gr_quotation_policy_data.xml",
+        "data/sale_report_defaults.xml",
         "views/gr_quotation_policy_views.xml",
         "views/res_company_views.xml",
         "views/sale_order_views.xml",

@@ -7,6 +7,13 @@
          built entirely by this module's own markup, per doc.
     ================================================================= -->
     <template id="report_gr_quotation_document">
+        <!-- web.report_layout renders <body class="container"> (Bootstrap,
+             max-width ~960-1140px) unless full_width is truthy, in which case
+             it uses "container-fluid" (edge-to-edge). Without this, the
+             report was rendering at ~75-80% of the page width, pinned left,
+             with every proportional/mm measurement below computed against
+             that shrunk width instead of the real page. -->
+        <t t-set="full_width" t-value="1"/>
         <t t-call="web.html_container">
             <t t-call="gr_quotation_report.gr_quotation_style"/>
             <t t-foreach="docs" t-as="doc">
@@ -56,10 +63,26 @@
                 font-weight: bold; font-style: italic;
             }
 
+            /* Belt-and-suspenders: neutralize Bootstrap's .container max-width
+               and gutters in case full_width isn't honored (e.g. a report
+               composed/previewed through a code path that overrides it), so
+               the page never silently reverts to a ~75-80%-wide column. */
+            html, body.o_body_html, body.container, body.container-fluid,
+            #wrapwrap, main, .article {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
             .gr_doc {
                 font-family: 'Nunito', Arial, Helvetica, sans-serif;
                 color: #111111;
                 font-size: 9.5pt;
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                box-sizing: border-box;
                 line-height: 1.35;
             }
             .gr_doc table { border-collapse: collapse; }

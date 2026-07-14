@@ -202,6 +202,31 @@ class TestGrQuotationReportRendering(GrQuotationReportCommon):
         self.assertEqual(action.report_type, "qweb-pdf")
         self.assertEqual(action.binding_model_id.model, "sale.order")
 
+    def test_gr_report_is_the_only_one_bound_to_sale_order(self):
+        standard_action = self.env.ref("sale.action_report_saleorder")
+        self.assertFalse(
+            standard_action.binding_model_id,
+            "El reporte estándar de Odoo debe quedar desvinculado de "
+            "sale.order para que 'Imprimir' use únicamente la Cotización "
+            "Getting Ready.")
+
+    def test_gr_report_is_used_for_send_by_email(self):
+        gr_action = self.env.ref("gr_quotation_report.action_report_gr_quotation")
+        for tmpl_xmlid in ("sale.email_template_edi_sale", "sale.mail_template_sale_confirmation"):
+            template = self.env.ref(tmpl_xmlid)
+            self.assertEqual(
+                template.report_template_ids.ids, gr_action.ids,
+                "%s debe adjuntar únicamente la Cotización Getting Ready." % tmpl_xmlid)
+
+    def test_report_body_requests_full_width(self):
+        # web.report_layout renders <body class="container-fluid"> only when
+        # full_width is truthy; otherwise it falls back to the Bootstrap
+        # "container" class, which is what shrank the page to ~75-80% width.
+        order = self._make_order(n_lines=1)
+        html = self._render_html(order)
+        self.assertIn("container-fluid", html)
+        self.assertNotIn('o_body_html container overflow-x-hidden', html)
+
     def test_report_filename_is_sanitized(self):
         order = self._make_order(n_lines=1)
         order.partner_id.name = 'Cliente "Raro" / Ex:tra*ño?'
