@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Always-visible capture page for every field the GR quotation PDF
+         prints. It inherits the base sale order form directly (not the
+         aq_rental_serial_planning view) on purpose: that module's "Evento
+         y Periodos" page is hidden unless x_is_event_rental is checked,
+         which made these fields impossible to fill in from a plain
+         quotation. The date/location fields are the ones aq_rental already
+         defines (x_event_start, x_block_start/x_block_end,
+         x_event_location) - shown here with the labels the report uses,
+         not duplicated. -->
     <record id="view_order_form_gr_quotation_report" model="ir.ui.view">
         <field name="name">sale.order.form.gr.quotation.report</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="aq_rental_serial_planning.view_order_form_serial_planning"/>
+        <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- New fields needed only by the GR quotation report, grouped
-                 together with the event fields already added by
-                 aq_rental_serial_planning ("Evento y Periodos" page). -->
-            <xpath expr="//page[@name='event_periods']//field[@name='x_event_location']" position="after">
-                <field name="x_contracting_partner_id"/>
-                <field name="x_event_coordinator"/>
-                <field name="x_additional_contact_phone"/>
+            <xpath expr="//notebook" position="inside">
+                <page string="Cotización GR" name="gr_quotation_info">
+                    <group>
+                        <group string="Evento">
+                            <field name="x_event_type_id" string="Tipo de evento"/>
+                            <field name="x_event_start" string="Fecha del evento"/>
+                            <field name="x_block_start" string="Fecha de montaje"/>
+                            <field name="x_block_end" string="Fecha de desmontaje"/>
+                        </group>
+                        <group string="Contacto y ubicación">
+                            <field name="x_contracting_partner_id" string="Contratante"/>
+                            <field name="x_event_coordinator" string="Coordinación / Wedding Planner"/>
+                            <field name="x_event_location" string="Dirección del montaje"/>
+                            <field name="x_additional_contact_phone" string="Teléfono de contacto adicional"/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>

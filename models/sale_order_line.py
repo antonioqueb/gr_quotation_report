@@ -61,23 +61,31 @@ class SaleOrderLine(models.Model):
             else:
                 line.x_gr_tax_label = ", ".join(t.name for t in line.tax_ids if t.name)
 
-    @api.depends("name", "product_id.display_name", "display_type")
+    @api.depends("name", "product_id.name", "product_id.display_name", "display_type")
     def _compute_gr_article_text(self):
         for line in self:
             if line.display_type:
                 line.x_gr_article_title = ""
                 line.x_gr_article_extra = ""
                 continue
-            product_name = (line.product_id.display_name or "").strip()
+            # Commercial name only: product.name excludes the internal
+            # reference that display_name prefixes as "[CODE] Name", which
+            # must not be printed on the quotation.
+            product_name = (line.product_id.name or "").strip()
+            display_name = (line.product_id.display_name or "").strip()
             full_text = (line.name or "").strip()
             title = product_name
             extra = full_text
             if full_text:
                 rows = full_text.split("\n")
-                if product_name and rows[0].strip() == product_name:
+                first = rows[0].strip()
+                # The line description usually repeats the product name on
+                # its first row - with or without the [CODE] prefix; drop
+                # that row from the extra text in both cases.
+                if product_name and first in (product_name, display_name):
                     extra = "\n".join(rows[1:]).strip()
                 elif not product_name:
-                    title = rows[0].strip()
+                    title = first
                     extra = "\n".join(rows[1:]).strip()
             if extra == title:
                 extra = ""
