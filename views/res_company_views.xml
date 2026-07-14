@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_gr_quotation_report" model="ir.ui.view">
+        <field name="name">res.company.form.gr.quotation.report</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Cotización Getting Ready" name="gr_quotation_report">
+                    <group>
+                        <group string="Encabezado del PDF">
+                            <field name="x_gr_quotation_logo" widget="image" class="oe_avatar"/>
+                            <field name="x_gr_logo_includes_wordmark"/>
+                        </group>
+                        <group string="Pie corporativo del PDF">
+                            <field name="x_gr_social_instagram" placeholder="@gettingready_mx"/>
+                            <div class="text-muted" colspan="2">
+                                El nombre, dirección, ciudad/estado/país, teléfono y
+                                correo del pie corporativo se toman de los datos
+                                generales de esta compañía.
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
