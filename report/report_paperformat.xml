@@ -7,12 +7,12 @@
          its bottom edge sits at (margin_top - header_spacing), growing
          upward from there.
            margin_top      = 49.6mm  (body start)
-           header_spacing  = 24mm    (pushes the compact band to the very
-                                      top: bottom rule at ~25.6mm)
-           header height   = 25mm    (fixed in gr_external_layout.xml, so
-                                      its top sits at ~0.6mm; the compact
-                                      band is what keeps the whole header -
-                                      rule included - high on the page)
+           header_spacing  = 30mm    (each extra mm of spacing raises the
+                                      rendered band ~1mm on this server,
+                                      per the visual iterations)
+           header height   = 28mm    (fixed in gr_external_layout.xml;
+                                      grown slightly so the logo can reach
+                                      27mm while the band stays compact)
 
          dpi MUST stay at 96: Odoo passes a zoom of 96/dpi to wkhtmltopdf
          (>= 0.12.2), so any other dpi rescales every CSS mm/pt in the
@@ -37,7 +37,7 @@
         <field name="margin_left">11.5</field>
         <field name="margin_right">13.8</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">24</field>
+        <field name="header_spacing">30</field>
         <field name="dpi">96</field>
         <field name="disable_shrinking" eval="True"/>
     </record>

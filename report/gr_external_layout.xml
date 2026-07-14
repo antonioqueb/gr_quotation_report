@@ -23,17 +23,14 @@
          <style> below. -->
     <template id="gr_external_layout_standard" inherit_id="web.external_layout_standard" primary="True">
 
-        <!-- Compact header band pushed as high as possible: 24.75mm content
-             + 0.25mm border = 25mm total. With margin_top=49.6 /
-             header_spacing=24 / dpi=96 (zoom 1.0, CSS mm = physical mm -
-             see report_paperformat.xml), the whole band - including its
-             bottom rule - hugs the top of the page (~0.6mm top edge, rule
-             at ~25.6mm). The logo fills nearly the full band height
-             (24mm), so the band stays compact - which is what keeps its
-             bottom rule high - while the logo reads larger. Body keeps
-             starting at 49.6mm. -->
+        <!-- Header band raised further (header_spacing=30 in the
+             paperformat pushes the anchor up; empirically each extra mm of
+             spacing raises the rendered band ~1mm on this server) with a
+             slightly taller 28mm band (27.75mm + 0.25mm border) so the
+             logo can grow to 27mm and still fill nearly the whole band.
+             Body keeps starting at margin_top=49.6mm. -->
         <xpath expr="//div[contains(@t-attf-class, 'header')]" position="attributes">
-            <attribute name="style">height: 24.75mm; border-bottom: 0.25mm solid #111111; overflow: hidden;</attribute>
+            <attribute name="style">height: 27.75mm; border-bottom: 0.25mm solid #111111; overflow: hidden;</attribute>
         </xpath>
 
         <!-- Replace the native logo+tagline strip with the three-zone
@@ -79,7 +76,7 @@
                     </td>
                     <td style="width: 42%; text-align: center; vertical-align: top;">
                         <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"
-                             style="max-width: 69.9mm; max-height: 24mm;"/>
+                             style="max-width: 69.9mm; max-height: 27mm;"/>
                     </td>
                     <td class="gr_hdr_side" style="width: 29%; text-align: right;">
                         <div>FECHA DE COT.: <t t-esc="o._gr_format_date(o.date_order)"/></div>
