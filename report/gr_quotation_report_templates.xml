@@ -88,9 +88,13 @@
             .gr_doc table { border-collapse: collapse; }
             .gr_doc td, .gr_doc th { vertical-align: top; }
 
-            /* ---- header ---- */
-            .gr_header_table { width: 100%; margin-bottom: 3mm; }
-            .gr_header_left { width: 32%; text-align: left; vertical-align: middle; }
+            /* ---- header ----
+               table-layout: fixed makes the 32/36/32 split immune to content
+               length (a long client name or a long date/folio can no longer
+               push the browser's automatic column-sizing to re-balance the
+               row and throw the centered logo off-center). */
+            .gr_header_table { width: 100%; table-layout: fixed; margin-bottom: 3mm; }
+            .gr_header_left { width: 32%; text-align: left; vertical-align: middle; overflow-wrap: break-word; }
             .gr_header_center { width: 36%; text-align: center; vertical-align: middle; }
             .gr_header_right { width: 32%; text-align: right; vertical-align: middle; font-size: 10pt; }
             .gr_header_label { color: #111111; font-weight: bold; }
@@ -111,10 +115,10 @@
             .gr_hr_thick { height: 1px; background-color: #111111; margin: 4mm 0 4mm 0; }
 
             /* ---- client / event block ---- */
-            .gr_info_table { width: 100%; margin-bottom: 3mm; }
+            .gr_info_table { width: 100%; table-layout: fixed; margin-bottom: 3mm; }
             .gr_info_left {
                 width: 51%; background-color: #F4F1EF; border: 1px solid #C9C9C9;
-                padding: 2.8mm; vertical-align: top;
+                padding: 2.8mm; vertical-align: top; overflow-wrap: break-word;
             }
             .gr_info_spacer { width: 1%; }
             .gr_info_right { width: 48%; vertical-align: top; padding: 0; }
@@ -123,8 +127,8 @@
                 padding: 2.5mm; vertical-align: top;
             }
             .gr_box_venue { margin-top: 1.5mm; }
-            .gr_subgrid { width: 100%; margin-top: 1mm; }
-            .gr_half { width: 50%; vertical-align: top; }
+            .gr_subgrid { width: 100%; table-layout: fixed; margin-top: 1mm; }
+            .gr_half { width: 50%; vertical-align: top; overflow-wrap: break-word; }
             .gr_label {
                 display: block; font-size: 7pt; text-transform: uppercase;
                 color: #111111; margin-bottom: 0.3mm;
@@ -136,7 +140,7 @@
             .gr_value_block { white-space: pre-line; }
 
             /* ---- products table ---- */
-            .gr_products_table { width: 100%; margin-top: 1mm; }
+            .gr_products_table { width: 100%; table-layout: fixed; margin-top: 1mm; }
             .gr_products_table thead th {
                 border-bottom: 1px solid #111111; font-size: 10.5pt; font-weight: bold;
                 padding-bottom: 1.8mm; text-align: left;
@@ -160,7 +164,7 @@
             .gr_row_note td { font-style: italic; color: #333333; }
 
             /* ---- summary ---- */
-            .gr_summary_wrap { width: 100%; margin-top: 4mm; page-break-inside: avoid; }
+            .gr_summary_wrap { width: 100%; table-layout: fixed; margin-top: 4mm; page-break-inside: avoid; }
             .gr_summary_spacer { width: 55%; }
             .gr_summary_col { width: 45%; vertical-align: top; }
             .gr_summary_table { width: 100%; }
@@ -183,7 +187,7 @@
             .gr_policy_list ul { margin: 1mm 0 1mm 4mm; padding-left: 3mm; list-style: disc; }
 
             /* ---- signatures ---- */
-            .gr_sign_wrap { width: 100%; margin-top: 9mm; page-break-inside: avoid; }
+            .gr_sign_wrap { width: 100%; table-layout: fixed; margin-top: 9mm; page-break-inside: avoid; }
             .gr_sign_cell { width: 45%; text-align: center; vertical-align: bottom; }
             .gr_sign_gap { width: 10%; }
             .gr_sign_line { border-top: 1px solid #111111; margin-top: 18mm; }
