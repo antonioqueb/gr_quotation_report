@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate="1": these seed the exact 24 commercial policies transcribed
+         from the "Cotización GR" reference document, but once installed they
+         are fully editable/orderable/deactivatable from
+         Ventas > Configuración > Políticas de cotización GR without touching
+         code, and a module upgrade will not silently overwrite business edits. -->
+    <data noupdate="1">
+
+        <record id="policy_01" model="gr.quotation.policy">
+            <field name="sequence">10</field>
+            <field name="name">01. Descuento por set adicional</field>
+            <field name="content"><![CDATA[<p>En caso de requerir más de un set podrás recibir un 10% de descuento.</p>]]></field>
+        </record>
+
+        <record id="policy_02" model="gr.quotation.policy">
+            <field name="sequence">20</field>
+            <field name="name">02. Flete dentro del área metropolitana</field>
+            <field name="content"><![CDATA[<p>Se agregarán $1,000 MXN a la reservación por flete, montaje y maniobras dentro del área metropolitana.</p>]]></field>
+        </record>
+
+        <record id="policy_03" model="gr.quotation.policy">
+            <field name="sequence">30</field>
+            <field name="name">03. Flete fuera del área metropolitana</field>
+            <field name="content"><![CDATA[<p>Se agregarán $1,400 MXN a la reservación por flete, montaje y maniobras fuera del área metropolitana. (Aplican restricciones)</p>]]></field>
+        </record>
+
+        <record id="policy_04" model="gr.quotation.policy">
+            <field name="sequence">40</field>
+            <field name="name">04. Horario de montaje y desmontaje</field>
+            <field name="content"><![CDATA[<p>Los horarios establecidos para montajes y desmontajes son de Lunes a Viernes de 9:00am a 6:00pm.</p>]]></field>
+        </record>
+
+        <record id="policy_05" model="gr.quotation.policy">
+            <field name="sequence">50</field>
+            <field name="name">05. Desmontaje especial</field>
+            <field name="content"><![CDATA[<p>El Desmontaje especial tiene un costo adicional de $800 MXN. Este se agregará a la reservación en caso de que:</p>
+<ul>
+<li>El montaje y/o desmontaje se realice en un hotel o salón.</li>
+<li>El montaje y/o desmontaje se realice dentro de un día festivo.</li>
+<li>El montaje y/o desmontaje se solicite fuera del horario establecido (L-V de 9:00am - 6:00pm)</li>
+</ul>]]></field>
+        </record>
+
+        <record id="policy_06" model="gr.quotation.policy">
+            <field name="sequence">60</field>
+            <field name="name">06. Uso de elevador</field>
+            <field name="content"><![CDATA[<p>Si el lugar del evento requiere el uso de elevador y este no estuviera disponible, se cobrará un cargo adicional de $1,000 MXN.</p>]]></field>
+        </record>
+
+        <record id="policy_07" model="gr.quotation.policy">
+            <field name="sequence">70</field>
+            <field name="name">07. Área despejada para montaje</field>
+            <field name="content"><![CDATA[<p>El área donde se realizará el montaje tendrá que estar previamente despejada. El equipo de Getting Ready no moverá mobiliario dentro del domicilio del evento para poder realizar el montaje.</p>]]></field>
+        </record>
+
+        <record id="policy_08" model="gr.quotation.policy">
+            <field name="sequence">80</field>
+            <field name="name">08. Persona responsable de acceso</field>
+            <field name="content"><![CDATA[<p>Para realizar el montaje y desmontaje, el cliente deberá asegurar que haya una persona responsable en un horario de 9:00am a 6:00pm, para que se pueda dar acceso al lugar.</p>]]></field>
+        </record>
+
+        <record id="policy_09" model="gr.quotation.policy">
+            <field name="sequence">90</field>
+            <field name="name">09. Tolerancia de 15 min al llegar</field>
+            <field name="content"><![CDATA[<p>Al llegar al domicilio, el cliente cuenta con 15 min de tolerancia para recibir al equipo de Getting Ready, de lo contrario perderá su reservación y pagos que haya realizado.</p>]]></field>
+        </record>
+
+        <record id="policy_10" model="gr.quotation.policy">
+            <field name="sequence">100</field>
+            <field name="name">10. Hora de gracia para desmontaje</field>
+            <field name="content"><![CDATA[<p>Una vez establecida la hora de desmontaje, el cliente contará solo con 1 hora de gracia para que el equipo de Getting Ready retire el mobiliario. De lo contrario se cobrará una penalidad de $500 MXN por hora.</p>]]></field>
+        </record>
+
+        <record id="policy_11" model="gr.quotation.policy">
+            <field name="sequence">110</field>
+            <field name="name">11. Desmontajes en hotel</field>
+            <field name="content"><![CDATA[<p>Para desmontajes en hotel el cliente debe asignar a una persona (puede ser personal del hotel) para que el equipo de Getting Ready tenga acceso a la habitación y poder realizar el desmontaje.</p>]]></field>
+        </record>
+
+        <record id="policy_12" model="gr.quotation.policy">
+            <field name="sequence">120</field>
+            <field name="name">12. Uso de Gift Cards</field>
+            <field name="content"><![CDATA[<p>El uso de las Gift Cards es únicamente para productos y servicios de Getting Ready (esto excluye a nuestros proveedores externos).</p>]]></field>
+        </record>
+
+        <record id="policy_13" model="gr.quotation.policy">
+            <field name="sequence">130</field>
+            <field name="name">13. Anticipo del 50%</field>
+            <field name="content"><![CDATA[<p>Para reservar tu fecha, se requiere cubrir el 50% del total de la renta. El 50% restante se liquida en la semana del evento.</p>]]></field>
+        </record>
+
+        <record id="policy_14" model="gr.quotation.policy">
+            <field name="sequence">140</field>
+            <field name="name">14. Cambios a la cotización</field>
+            <field name="content"><![CDATA[<p>Si se requiere realizar algún cambio a la cotización o agregar productos, será bajo disponibilidad del mobiliario.</p>]]></field>
+        </record>
+
+        <record id="policy_15" model="gr.quotation.policy">
+            <field name="sequence">150</field>
+            <field name="name">15. Política de cancelación</field>
+            <field name="content"><![CDATA[<p>En caso de cancelaciones, se reembolsará el 100% de los pagos realizados únicamente 1 mes antes de la fecha pactada. En caso de querer cancelar con menos de 1 mes de anticipación, no se realizará el reembolso de los pagos realizados.</p>]]></field>
+        </record>
+
+        <record id="policy_16" model="gr.quotation.policy">
+            <field name="sequence">160</field>
+            <field name="name">16. Formas de pago</field>
+            <field name="content"><![CDATA[<p>Los pagos se pueden realizar por transferencia o efectivo.</p>]]></field>
+        </record>
+
+        <record id="policy_17" model="gr.quotation.policy">
+            <field name="sequence">170</field>
+            <field name="name">17. Referencia de transferencia</field>
+            <field name="content"><![CDATA[<p>Al momento de realizar tu pago por transferencia solicitamos poner como asunto o referencia el nombre completo de la persona y enviar el comprobante de pago al WhatsApp 8110767937 o a nuestro correo info@gettingready.mx.</p>]]></field>
+        </record>
+
+        <record id="policy_18" model="gr.quotation.policy">
+            <field name="sequence">180</field>
+            <field name="name">18. Formulario posterior al pago</field>
+            <field name="content"><![CDATA[<p>Una vez enviado el comprobante de pago, se enviará un formulario a completar. El formulario sirve para tener punto de contacto y que el montaje y desmontaje sea eficiente.</p>]]></field>
+        </record>
+
+        <record id="policy_19" model="gr.quotation.policy">
+            <field name="sequence">190</field>
+            <field name="name">19. Confirmación de hora de llegada</field>
+            <field name="content"><![CDATA[<p>El montaje se realizará siempre antes de que inicie el evento (hasta un día antes). El equipo de Getting Ready se pondrá en contacto contigo 7 días antes del evento para confirmar un estimado en la hora de llegada.</p>]]></field>
+        </record>
+
+        <record id="policy_20" model="gr.quotation.policy">
+            <field name="sequence">200</field>
+            <field name="name">20. Programación de desmontaje</field>
+            <field name="content"><![CDATA[<p>Para eventos entre semana (L-V) el desmontaje se realizará el mismo día. Eventos que sean en fin de semana, el desmontaje se programa para el lunes posterior al fin de semana.</p>]]></field>
+        </record>
+
+        <record id="policy_21" model="gr.quotation.policy">
+            <field name="sequence">210</field>
+            <field name="name">21. Desmontaje especial tras peinado y maquillaje</field>
+            <field name="content"><![CDATA[<p>En caso de que el espacio donde se realice el montaje tenga que ser desocupado al finalizar el peinado y maquillaje, favor de solicitar un desmontaje especial ya que solo el personal de Getting Ready está autorizado para realizar movimientos de montaje y desmontaje al mobiliario.</p>]]></field>
+        </record>
+
+        <record id="policy_22" model="gr.quotation.policy">
+            <field name="sequence">220</field>
+            <field name="name">22. Responsabilidad tras instalación</field>
+            <field name="content"><![CDATA[<p>Una vez instalado el mobiliario, cualquier accidente es a cuenta y riesgo del cliente. En caso de que el equipo sufra algún daño o extravío será sujeto a cobro total o parcial.</p>]]></field>
+        </record>
+
+        <record id="policy_23" model="gr.quotation.policy">
+            <field name="sequence">230</field>
+            <field name="name">23. Responsabilidad por condiciones del lugar</field>
+            <field name="content"><![CDATA[<p>El cliente asume total responsabilidad por el uso del mobiliario, su ubicación e integridad física y funcional, independientemente del entorno donde decida montarlo. Cualquier daño, mal funcionamiento o deterioro del producto que sea consecuencia directa o indirecta de las condiciones del lugar de instalación (ya sea una residencia, hotel, comercio, oficina u otro) será responsabilidad exclusiva del cliente.</p>
+<p>Esto incluye:</p>
+<ul>
+<li>Fallos eléctricos de la ubicación</li>
+<li>Variaciones de voltaje</li>
+<li>Cortocircuitos</li>
+<li>Voltaje demasiado alto</li>
+<li>Filtraciones de agua</li>
+<li>Humedad</li>
+<li>Sobrecalentamiento por mala ventilación</li>
+<li>Problemas con la instalación eléctrica del lugar del montaje</li>
+<li>Manipulaciones por parte de terceros</li>
+<li>Vandalismo</li>
+<li>O cualquier situación derivada del contexto donde el mobiliario haya sido montado</li>
+</ul>
+<p>El hecho de que la causa del daño se atribuya al lugar de instalación no absuelve al cliente de su responsabilidad, ya que es quien determina la ubicación final del mobiliario y autoriza su instalación en dicho entorno.</p>]]></field>
+        </record>
+
+        <record id="policy_24" model="gr.quotation.policy">
+            <field name="sequence">240</field>
+            <field name="name">24. Vigencia de la cotización</field>
+            <field name="content"><![CDATA[<p>Las cotizaciones son válidas únicamente por 30 días después de la fecha de expedición.</p>]]></field>
+        </record>
+
+    </data>
+</odoo>
