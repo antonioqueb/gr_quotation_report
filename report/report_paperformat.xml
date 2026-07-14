@@ -7,10 +7,10 @@
          its bottom edge sits at (margin_top - header_spacing), growing
          upward from there.
            margin_top      = 49.6mm  (body start)
-           header_spacing  = 22mm    (pushes the compact band to the very
-                                      top: bottom rule at ~27.6mm)
-           header height   = 26mm    (fixed in gr_external_layout.xml, so
-                                      its top sits at ~1.6mm; the compact
+           header_spacing  = 24mm    (pushes the compact band to the very
+                                      top: bottom rule at ~25.6mm)
+           header height   = 25mm    (fixed in gr_external_layout.xml, so
+                                      its top sits at ~0.6mm; the compact
                                       band is what keeps the whole header -
                                       rule included - high on the page)
 
@@ -37,7 +37,7 @@
         <field name="margin_left">11.5</field>
         <field name="margin_right">13.8</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">22</field>
+        <field name="header_spacing">24</field>
         <field name="dpi">96</field>
         <field name="disable_shrinking" eval="True"/>
     </record>
