@@ -31,7 +31,7 @@ class SaleOrderLine(models.Model):
         help="Cantidad formateada sin decimales innecesarios, con la unidad "
              "de medida cuando no es la unidad genérica.")
 
-    @api.depends("product_uom_qty", "product_uom", "display_type")
+    @api.depends("product_uom_qty", "product_uom_id", "display_type")
     def _compute_gr_qty_label(self):
         for line in self:
             if line.display_type:
@@ -39,7 +39,7 @@ class SaleOrderLine(models.Model):
                 continue
             qty = line.product_uom_qty or 0.0
             qty_text = "%g" % qty if qty % 1 else "%d" % int(qty)
-            uom = line.product_uom
+            uom = line.product_uom_id
             if uom and uom.name and uom.name.lower() not in ("units", "unidades", "unidad", "unit"):
                 qty_text = "%s %s" % (qty_text, uom.name)
             line.x_gr_qty_label = qty_text
@@ -53,13 +53,13 @@ class SaleOrderLine(models.Model):
                 line.x_gr_price_after_discount = (
                     (line.price_unit or 0.0) * (1.0 - (line.discount or 0.0) / 100.0))
 
-    @api.depends("tax_id", "display_type")
+    @api.depends("tax_ids", "display_type")
     def _compute_gr_tax_label(self):
         for line in self:
-            if line.display_type or not line.tax_id:
+            if line.display_type or not line.tax_ids:
                 line.x_gr_tax_label = ""
             else:
-                line.x_gr_tax_label = ", ".join(t.name for t in line.tax_id if t.name)
+                line.x_gr_tax_label = ", ".join(t.name for t in line.tax_ids if t.name)
 
     @api.depends("name", "product_id.display_name", "display_type")
     def _compute_gr_article_text(self):

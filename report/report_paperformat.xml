@@ -5,12 +5,14 @@
          the template (see gr_quotation_report_templates.xml): the template
          builds the full page itself, so there is no separate "disable
          header" flag to set here. -->
+    <!-- format='Letter' already fixes the physical page to 215.9 x 279.4 mm
+         (8.5x11in ~ 216x279.4mm requested). page_width/page_height must stay
+         empty: report.paperformat forbids combining a named format with an
+         explicit custom size (see _check_format_or_page constraint). -->
     <record id="paperformat_gr_quotation" model="report.paperformat">
         <field name="name">Getting Ready - Cotización (Carta)</field>
         <field name="default" eval="False"/>
-        <field name="format">us_letter</field>
-        <field name="page_height">279.4</field>
-        <field name="page_width">216</field>
+        <field name="format">Letter</field>
         <field name="orientation">Portrait</field>
         <field name="margin_top">11</field>
         <field name="margin_bottom">11</field>

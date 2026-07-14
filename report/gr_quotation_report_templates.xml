@@ -291,7 +291,7 @@
             </thead>
             <tbody>
                 <t t-foreach="doc.order_line" t-as="line">
-                    <t t-if="line.display_type == 'line_section'">
+                    <t t-if="line.display_type in ('line_section', 'line_subsection')">
                         <tr class="gr_row_section"><td colspan="7" t-esc="line.name"/></tr>
                     </t>
                     <t t-elif="line.display_type == 'line_note'">

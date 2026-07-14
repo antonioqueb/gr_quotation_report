@@ -93,7 +93,7 @@ class GrQuotationReportCommon(TransactionCase):
                 "product_uom_qty": 1,
                 "price_unit": product.list_price,
                 "discount": 10.0 if with_discount else 0.0,
-                "tax_id": [(6, 0, product.taxes_id.ids)],
+                "tax_ids": [(6, 0, product.taxes_id.ids)],
             })
         return order
 
